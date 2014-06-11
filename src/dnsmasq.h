@@ -796,6 +796,7 @@ int expand_buf(struct iovec *iov, size_t size);
 char *print_mac(char *buff, unsigned char *mac, int len);
 void bump_maxfd(int fd, int *max);
 int read_write(int fd, unsigned char *packet, int size, int rw);
+int wildcard_matchn(const char* wildcard, const char* match, int num);
 
 /* log.c */
 void die(char *message, char *arg1, int exit_code);
