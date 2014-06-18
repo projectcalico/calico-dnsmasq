@@ -1,3 +1,9 @@
+dnsmasq (2.72-1-calico0.1) unstable; urgency=low
+
+   * Packaging for Project Calico.
+
+ -- Neil Jerram <nj@metaswitch.com>  Thu, 26 Jun 2014 14:35:39 +0100
+
 dnsmasq (2.72-1) unstable; urgency=low
 
    * New upstream.

@@ -1,0 +1,2 @@
+This distribution of Dnsmasq, from projectcalico.org, is distributed
+under the GPL version 3.  See the file COPYING-v3 for details.
