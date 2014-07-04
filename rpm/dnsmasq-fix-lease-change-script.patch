@@ -1,0 +1,34 @@
+From 8d2e21c41696ce40adaeaa14861dcfa405e3412e Mon Sep 17 00:00:00 2001
+From: Jiri Denemark <jdenemar@redhat.com>
+Date: Fri, 12 Oct 2012 12:02:58 +0200
+Subject: [PATCH] Fix lease-change script
+
+https://bugzilla.redhat.com/show_bug.cgi?id=815819
+
+Partial backport of
+commit 03a97b617071ce506357ac9b505d39fa283833ec
+Author: Simon Kelley <simon@thekelleys.org.uk>
+Date:   Wed Jun 10 20:55:49 2009 +0100
+
+Fix regression in 2.48 which disables the lease-change
+script. Thanks to Jose Luis Duran for spotting this.
+---
+ src/dnsmasq.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/dnsmasq.c b/src/dnsmasq.c
+index 26adab3..2df15af 100644
+--- a/src/dnsmasq.c
++++ b/src/dnsmasq.c
+@@ -603,7 +603,7 @@ int main (int argc, char **argv)
+       bump_maxfd(piperead, &maxfd);
+ 
+ #ifdef HAVE_DHCP
+-#  ifdef NO_FORK
++#  ifndef NO_FORK
+       while (helper_buf_empty() && do_script_run(now));
+ 
+       if (!helper_buf_empty())
+-- 
+1.7.12.3
+

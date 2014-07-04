@@ -1,0 +1,35 @@
+--- rpm/dnsmasq.init.orig	2011-08-17 10:10:53.000000000 +0800
++++ rpm/dnsmasq.init	2011-08-17 10:15:22.000000000 +0800
+@@ -29,6 +29,10 @@ RETVAL=0
+ # See how we were called.
+ case "$1" in
+   start)
++        if [ $UID -ne 0 ] ; then
++            echo "User has insufficient privilege."
++            exit 4
++        fi
+         echo -n "Starting dnsmasq: "
+         daemon $dnsmasq $OPTIONS
+ 	RETVAL=$?
+@@ -54,6 +58,12 @@ case "$1" in
+ 	RETVAL=$?
+ 	echo
+ 	;;
++  force-reload)
++        # new configuration takes effect only after restart
++	$0 stop
++	$0 start
++	RETVAL=$?
++        ;;
+   restart)
+ 	$0 stop
+ 	$0 start
+@@ -68,7 +78,7 @@ case "$1" in
+ 	    ;;
+   *)
+         echo "Usage: $0 {start|stop|restart|reload|condrestart|status}"
+-        exit 1
++        exit 2
+ esac
+ 
+ exit $RETVAL
