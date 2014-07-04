@@ -10,14 +10,14 @@
 %endif
 
 Name:           dnsmasq
-Version:        2.48
-Release:        14%{?extraversion}%{?dist}
+Version:        2.72_calico0.1
+Release:        1%{?extraversion}%{?dist}
 Summary:        A lightweight DHCP/caching DNS server
 
 Group:          System Environment/Daemons
 License:        GPLv2 or GPLv3
 URL:            http://www.thekelleys.org.uk/dnsmasq/
-Source0:        http://www.thekelleys.org.uk/dnsmasq/%{?extrapath}%{name}-%{version}%{?extraversion}.tar.lzma
+Source0:        dnsmasq-%{version}.tar.gz
 Patch0:         %{name}-2.33-initscript.patch
 Patch1:         %{name}-configuration.patch
 Patch2:         %{name}-2.48-tftp-server-vulnerabilities.patch
@@ -63,16 +63,8 @@ query/remove a DHCP server's leases.
 %prep
 %setup -q -n %{name}-%{version}%{?extraversion}
 %patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p0
 %patch4 -p0
-%patch5 -p1
-%patch6 -p1
-%patch7 -p1
-%patch8 -p1
 %patch9 -p1
-%patch10 -p1
 %patch11 -p1
 
 %build
@@ -138,7 +130,7 @@ fi
 
 %files
 %defattr(-,root,root,-)
-%doc CHANGELOG COPYING FAQ doc.html setup.html dbus/DBus-interface
+%doc CHANGELOG COPYING-v3 FAQ doc.html setup.html dbus/DBus-interface
 %config(noreplace) %attr(644,root,root) %{_sysconfdir}/dnsmasq.conf
 %dir /etc/dnsmasq.d
 %dir %{_var}/lib/dnsmasq
@@ -152,6 +144,9 @@ fi
 %{_mandir}/man1/dhcp_*
 
 %changelog
+* Fri Jul 04 2014 Neil Jerram <nj@metaswitch.com> - 2.72_calico0.1
+- Packaging for Project Calico, based on latest upstream source
+
 * Fri Apr 04 2014 Tomas Hozza <thozza@redhat.com> - 2.48-14
 - Fix initscript status command to check only the system instance (#991473)
 
