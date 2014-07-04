@@ -10,14 +10,14 @@
 %endif
 
 Name:           dnsmasq
-Version:        2.48
-Release:        14%{?extraversion}%{?dist}
+Version:        2.72_calico0.13
+Release:        1%{?extraversion}%{?dist}
 Summary:        A lightweight DHCP/caching DNS server
 
 Group:          System Environment/Daemons
 License:        GPLv2 or GPLv3
 URL:            http://www.thekelleys.org.uk/dnsmasq/
-Source0:        http://www.thekelleys.org.uk/dnsmasq/%{?extrapath}%{name}-%{version}%{?extraversion}.tar.lzma
+Source0:        dnsmasq-%{version}.tar.gz
 Patch0:         %{name}-2.33-initscript.patch
 Patch1:         %{name}-configuration.patch
 Patch2:         %{name}-2.48-tftp-server-vulnerabilities.patch
@@ -42,13 +42,13 @@ Requires(preun): /sbin/chkconfig
 Requires(preun): /sbin/service
 
 %description
-Dnsmasq is lightweight, easy to configure DNS forwarder and DHCP server. 
-It is designed to provide DNS and, optionally, DHCP, to a small network. 
-It can serve the names of local machines which are not in the global 
-DNS. The DHCP server integrates with the DNS server and allows machines 
-with DHCP-allocated addresses to appear in the DNS with names configured 
-either in each host or in a central configuration file. Dnsmasq supports 
-static and dynamic DHCP leases and BOOTP for network booting of diskless 
+Dnsmasq is lightweight, easy to configure DNS forwarder and DHCP server.
+It is designed to provide DNS and, optionally, DHCP, to a small network.
+It can serve the names of local machines which are not in the global
+DNS. The DHCP server integrates with the DNS server and allows machines
+with DHCP-allocated addresses to appear in the DNS with names configured
+either in each host or in a central configuration file. Dnsmasq supports
+static and dynamic DHCP leases and BOOTP for network booting of diskless
 machines.
 
 %package        utils
@@ -63,16 +63,8 @@ query/remove a DHCP server's leases.
 %prep
 %setup -q -n %{name}-%{version}%{?extraversion}
 %patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p0
 %patch4 -p0
-%patch5 -p1
-%patch6 -p1
-%patch7 -p1
-%patch8 -p1
 %patch9 -p1
-%patch10 -p1
 %patch11 -p1
 
 %build
@@ -138,7 +130,7 @@ fi
 
 %files
 %defattr(-,root,root,-)
-%doc CHANGELOG COPYING FAQ doc.html setup.html dbus/DBus-interface
+%doc CHANGELOG COPYING-v3 FAQ doc.html setup.html dbus/DBus-interface
 %config(noreplace) %attr(644,root,root) %{_sysconfdir}/dnsmasq.conf
 %dir /etc/dnsmasq.d
 %dir %{_var}/lib/dnsmasq
@@ -152,6 +144,22 @@ fi
 %{_mandir}/man1/dhcp_*
 
 %changelog
+* Fri Sep 26 2014 Neil Jerram <nj@metaswitch.com> - 2.72_calico0.4.1
+- Fix for an intermittent Calico/IPv6 connectivity loss; please see
+  https://github.com/Metaswitch/calico/issues/14 for details:
+  - Set RA link-local addr correctly when sending on alias interface
+
+* Tue Sep 16 2014 Neil Jerram <nj@metaswitch.com> - 2.72_calico0.4
+- Updates for Calico/IPv6 connectivity:
+  - Implement aliasing idea (per --bridge-interfaces) for DHCPv6 as well as for v4
+  - Allow configuration of on-link (L) bit in Router Advertisement prefix option
+  - Implement aliasing idea (per --bridge-interfaces) for solicited Router Advertisements
+  - Implement aliasing for unsolicited router advertisements
+  - Documentation for IPv6 enhancements
+
+* Fri Jul 04 2014 Neil Jerram <nj@metaswitch.com> - 2.72_calico0.1
+- Packaging for Project Calico, based on latest upstream source
+
 * Fri Apr 04 2014 Tomas Hozza <thozza@redhat.com> - 2.48-14
 - Fix initscript status command to check only the system instance (#991473)
 
