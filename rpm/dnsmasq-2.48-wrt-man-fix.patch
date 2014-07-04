@@ -1,0 +1,91 @@
+commit 7de060b08dc8f7ea9fd1f972e3c55beab2df51b1
+Author: Simon Kelley <simon@thekelleys.org.uk>
+Date:   Fri Aug 26 17:24:52 2011 +0100
+
+    import of dnsmasq-2.58.tar.gz
+
+subset with just the contrib/wrt man page and patch
+
+diff --git a/contrib/wrt/dhcp_lease_time.1 b/contrib/wrt/dhcp_lease_time.1
+new file mode 100644
+index 0000000..2720b71
+--- /dev/null
++++ b/contrib/wrt/dhcp_lease_time.1
+@@ -0,0 +1,23 @@
++.TH DHCP_LEASE_TIME 1
++.SH NAME
++dhcp_lease_time \- Query remaining time of a lease on a the local dnsmasq DHCP server.
++.SH SYNOPSIS
++.B  dhcp_lease_time <address>
++.SH "DESCRIPTION"
++Send a DHCPINFORM message to a dnsmasq server running on the local host
++and print (to stdout) the time remaining in any lease for the given
++address. The time is given as string printed to stdout.
++
++If an error occurs or no lease exists for the given address, 
++nothing is sent to stdout a message is sent to stderr and a
++non-zero error code is returned.
++
++Requires dnsmasq 2.40 or later and may not work with other DHCP servers.
++
++The address argument is a dotted-quad IP addresses and mandatory. 
++.SH SEE ALSO
++.BR dnsmasq (8)
++.SH AUTHOR
++This manual page was written by Simon Kelley <simon@thekelleys.org.uk>.
++
++
+diff --git a/contrib/wrt/dhcp_release.1 b/contrib/wrt/dhcp_release.1
+new file mode 100644
+index 0000000..eb5307a
+--- /dev/null
++++ b/contrib/wrt/dhcp_release.1
+@@ -0,0 +1,35 @@
++.TH DHCP_RELEASE 1
++.SH NAME
++dhcp_release \- Release a DHCP lease on a the local dnsmasq DHCP server.
++.SH SYNOPSIS
++.B dhcp_release <interface> <address> <MAC address> <client_id>
++.SH "DESCRIPTION"
++A utility which forces the DHCP server running on this machine to release a 
++DHCP lease.
++.PP
++Send a DHCPRELEASE message via the specified interface to tell the
++local DHCP server to delete a particular lease. 
++
++The interface argument is the interface in which a DHCP
++request _would_ be received if it was coming from the client, 
++rather than being faked up here.
++   
++The address argument is a dotted-quad IP addresses and mandatory. 
++   
++The MAC address is colon separated hex, and is mandatory. It may be 
++prefixed by an address-type byte followed by -, eg
++
++10-11:22:33:44:55:66
++
++but if the address-type byte is missing it is assumed to be 1, the type 
++for ethernet. This encoding is the one used in dnsmasq lease files.
++
++The client-id is optional. If it is "*" then it treated as being missing.
++.SH NOTES
++MUST be run as root - will fail otherwise.
++.SH SEE ALSO
++.BR dnsmasq (8)
++.SH AUTHOR
++This manual page was written by Simon Kelley <simon@thekelleys.org.uk>.
++
++
+diff --git a/contrib/wrt/dhcp_release.c b/contrib/wrt/dhcp_release.c
+index c66d3a0..efa3fff 100644
+--- a/contrib/wrt/dhcp_release.c
++++ b/contrib/wrt/dhcp_release.c
+@@ -178,7 +178,7 @@ static int is_same_net(struct in_addr a, struct in_addr b, struct in_addr mask)
+   return (a.s_addr & mask.s_addr) == (b.s_addr & mask.s_addr);
+ }
+ 
+-static struct in_addr find_interface(struct in_addr client, int fd, int index)
++static struct in_addr find_interface(struct in_addr client, int fd, unsigned int index)
+ {
+   struct sockaddr_nl addr;
+   struct nlmsghdr *h;

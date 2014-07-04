@@ -1,0 +1,91 @@
+diff -rup dnsmasq-2.48.orig/src/dhcp.c dnsmasq-2.48/src/dhcp.c
+--- dnsmasq-2.48.orig/src/dhcp.c	2012-12-28 16:39:03.348018104 +0900
++++ dnsmasq-2.48/src/dhcp.c	2012-12-28 17:32:47.464031920 +0900
+@@ -987,5 +987,39 @@ char *strip_hostname(char *hostname)
+   return NULL;
+ }
+ 
++void bindtodevice(int fd)
++{
++  /* If we are doing DHCP on exactly one interface, and running linux, do SO_BINDTODEVICE
++     to that device. This is for the use case of  (eg) OpenStack, which runs a new
++     dnsmasq instance for each VLAN interface it creates. Without the BINDTODEVICE, 
++     individual processes don't always see the packets they should.
++     SO_BINDTODEVICE is only available Linux. */
++  
++  struct irec *iface, *found;
++
++  for (found = NULL, iface = daemon->interfaces; iface; iface = iface->next)
++    if (iface->dhcp_ok)
++      {
++       if (!found)
++         found = iface;
++       else if (strcmp(found->name, iface->name) != 0) 
++         {
++           /* more than one. */
++           found = NULL;
++           break;
++         }
++      }
++  
++  if (found)
++       {
++         struct ifreq ifr;
++         strcpy(ifr.ifr_name, found->name);
++         /* only allowed by root. */
++         if (setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE, (void *)&ifr, sizeof(ifr)) == -1 &&
++             errno != EPERM)
++           die(_("failed to set SO_BINDTODEVICE on DHCP socket: %s"), NULL, EC_BADNET);
++       }
++}
++
+ #endif
+ 
+diff -rup dnsmasq-2.48.orig/src/dnsmasq.c dnsmasq-2.48/src/dnsmasq.c
+--- dnsmasq-2.48.orig/src/dnsmasq.c	2012-12-28 16:39:03.430016145 +0900
++++ dnsmasq-2.48/src/dnsmasq.c	2012-12-28 17:32:47.465017311 +0900
+@@ -182,6 +182,9 @@ int main (int argc, char **argv)
+ 	    prettyprint_addr(&if_tmp->addr, daemon->namebuff);
+ 	    die(_("no interface with address %s"), daemon->namebuff, EC_BADNET);
+ 	  }
++      /* after enumerate_interfaces()  */
++      if (daemon->dhcp)
++         bindtodevice(daemon->dhcpfd);
+     }
+   else if ((daemon->port != 0 || (daemon->options & OPT_TFTP)) &&
+ 	   !(daemon->listeners = create_wildcard_listeners()))
+diff -rup dnsmasq-2.48.orig/src/dnsmasq.h dnsmasq-2.48/src/dnsmasq.h
+--- dnsmasq-2.48.orig/src/dnsmasq.h	2012-12-28 16:39:03.430016145 +0900
++++ dnsmasq-2.48/src/dnsmasq.h	2012-12-28 17:32:47.465017311 +0900
+@@ -699,6 +699,7 @@ void cache_unhash_dhcp(void);
+ void dump_cache(time_t now);
+ char *cache_get_name(struct crec *crecp);
+ char *get_domain(struct in_addr addr);
++void bindtodevice(int fd);
+ 
+ /* rfc1035.c */
+ unsigned short extract_request(HEADER *header, size_t qlen, 
+diff -rup dnsmasq-2.48.orig/src/network.c dnsmasq-2.48/src/network.c
+--- dnsmasq-2.48.orig/src/network.c	2012-12-28 16:39:03.433022629 +0900
++++ dnsmasq-2.48/src/network.c	2012-12-28 17:32:47.466016269 +0900
+@@ -119,7 +119,7 @@ static int iface_allowed(struct irec **i
+ 			 union mysockaddr *addr, struct in_addr netmask) 
+ {
+   struct irec *iface;
+-  int fd;
++  int fd, loopback;
+   struct ifreq ifr;
+   int dhcp_ok = 1;
+   struct iname *tmp;
+@@ -143,6 +143,11 @@ static int iface_allowed(struct irec **i
+       return 0;
+     }
+   
++  loopback = ifr.ifr_flags & IFF_LOOPBACK;
++
++  if (loopback)
++     dhcp_ok = 0;
++
+   close(fd);
+   
+   /* If we are restricting the set of interfaces to use, make

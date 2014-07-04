@@ -1,0 +1,69 @@
+From 65557a09313ff0559538a4edcc621e91c2776a0f Mon Sep 17 00:00:00 2001
+From: Simon Kelley <simon@thekelleys.org.uk>
+Date: Wed, 13 Jun 2012 13:43:49 +0100
+Subject: [PATCH] Check tftp-root exists and is accessible at startup.
+
+https://bugzilla.redhat.com/show_bug.cgi?id=824214
+
+(cherry picked from commit 8b3ae2fd43cef49709d590435773d5f1f9a6fd49)
+
+Conflicts:
+	CHANGELOG
+	src/dnsmasq.c
+	src/dnsmasq.h
+	src/option.c
+---
+ src/dnsmasq.c | 17 +++++++++++++++++
+ src/dnsmasq.h |  1 +
+ 2 files changed, 18 insertions(+)
+
+diff --git a/src/dnsmasq.c b/src/dnsmasq.c
+index 2df15af..7036763 100644
+--- a/src/dnsmasq.c
++++ b/src/dnsmasq.c
+@@ -439,6 +439,20 @@ int main (int argc, char **argv)
+     prctl(PR_SET_DUMPABLE, 1);
+ #endif
+ 
++#ifdef HAVE_TFTP
++  if (daemon->tftp_prefix)
++    {
++      DIR *dir;
++
++      if (!((dir = opendir(daemon->tftp_prefix))))
++        {
++          send_event(err_pipe[1], EVENT_TFTP_ERR, errno);
++          _exit(0);
++        }
++      closedir(dir);
++    }
++#endif
++
+   if (daemon->port == 0)
+     my_syslog(LOG_INFO, _("started, version %s DNS disabled"), VERSION);
+   else if (daemon->cachesize != 0)
+@@ -771,6 +785,9 @@ static void fatal_event(struct event_desc *ev)
+ 
+     case EVENT_LOG_ERR:
+       die(_("cannot open %s: %s"), daemon->log_file ? daemon->log_file : "log", EC_FILE);
++
++    case EVENT_TFTP_ERR:
++      die(_("TFTP directory %s inaccessible: %s"), daemon->tftp_prefix, EC_FILE);
+     }
+ }	
+       
+diff --git a/src/dnsmasq.h b/src/dnsmasq.h
+index e04a2c1..9251af8 100644
+--- a/src/dnsmasq.h
++++ b/src/dnsmasq.h
+@@ -136,6 +136,7 @@ struct event_desc {
+ #define EVENT_DIE       16
+ #define EVENT_LOG_ERR   17
+ #define EVENT_FORK_ERR  18
++#define EVENT_TFTP_ERR  20
+ 
+ /* Exit codes. */
+ #define EC_GOOD        0
+-- 
+1.7.12.3
+

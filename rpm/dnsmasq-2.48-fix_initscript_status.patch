@@ -1,0 +1,25 @@
+diff -up dnsmasq-2.48/rpm/dnsmasq.init.status dnsmasq-2.48/rpm/dnsmasq.init
+--- dnsmasq-2.48/rpm/dnsmasq.init.status	2013-08-09 15:59:59.984760557 +0200
++++ dnsmasq-2.48/rpm/dnsmasq.init	2013-08-12 15:48:36.409167109 +0200
+@@ -26,6 +26,8 @@ fi
+ 
+ RETVAL=0
+ 
++PIDFILE="/var/run/dnsmasq.pid"
++
+ # See how we were called.
+ case "$1" in
+   start)
+@@ -46,10 +48,10 @@ case "$1" in
+         fi
+ 	RETVAL=$?
+         echo
+-        [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/dnsmasq /var/run/dnsmasq.pid
++        [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/dnsmasq $PIDFILE
+         ;;
+   status)
+-	status dnsmasq
++	status -p $PIDFILE dnsmasq
+ 	RETVAL=$?
+ 	;;
+   reload)

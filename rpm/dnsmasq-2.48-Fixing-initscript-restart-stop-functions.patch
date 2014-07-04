@@ -1,0 +1,49 @@
+From 06ad8c970ef6baf7c6aeec090427ab81965d7a8b Mon Sep 17 00:00:00 2001
+From: Tomas Hozza <thozza@redhat.com>
+Date: Mon, 19 Nov 2012 16:00:27 +0100
+Subject: [PATCH] Fixing initscript restart/stop functions
+
+Service dnsmasq restart/stop/condrestart (or dnsmasq package update)
+now does not kill all instances of dnsmasq on system.
+---
+ rpm/dnsmasq.init | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/rpm/dnsmasq.init b/rpm/dnsmasq.init
+index c82047b..e516472 100644
+--- a/rpm/dnsmasq.init
++++ b/rpm/dnsmasq.init
+@@ -40,7 +40,7 @@ case "$1" in
+         [ $RETVAL -eq 0 ] && touch /var/lock/subsys/dnsmasq
+         ;;
+   stop)
+-        if test "x`pidof dnsmasq`" != x; then
++        if test "x`pidfileofproc dnsmasq`" != x; then
+             echo -n "Shutting down dnsmasq: "
+             killproc dnsmasq
+         fi
+@@ -53,8 +53,10 @@ case "$1" in
+ 	RETVAL=$?
+ 	;;
+   reload)
+-	echo -n "Reloading dnsmasq: "
+-	killproc dnsmasq -HUP
++	if test "x`pidfileofproc dnsmasq`" != x; then
++		echo -n "Reloading dnsmasq: "
++		killproc dnsmasq -HUP
++	fi
+ 	RETVAL=$?
+ 	echo
+ 	;;
+@@ -70,7 +72,7 @@ case "$1" in
+ 	RETVAL=$?
+ 	;;
+   condrestart)
+-	    if test "x`/sbin/pidof dnsmasq`" != x; then
++	    if test "x`pidfileofproc dnsmasq`" != x; then
+ 		$0 stop
+ 		$0 start
+ 		RETVAL=$?
+-- 
+1.7.11.7
+

@@ -1,0 +1,57 @@
+diff -up dnsmasq-2.48/dnsmasq.conf.example.orig dnsmasq-2.48/dnsmasq.conf.example
+--- dnsmasq-2.48/dnsmasq.conf.example.orig	2009-04-04 06:39:29.000000000 -0500
++++ dnsmasq-2.48/dnsmasq.conf.example	2009-06-10 07:13:33.000000000 -0500
+@@ -410,7 +410,7 @@
+ # The DHCP server needs somewhere on disk to keep its lease database.
+ # This defaults to a sane location, but if you want to change it, use
+ # the line below.
+-#dhcp-leasefile=/var/lib/misc/dnsmasq.leases
++#dhcp-leasefile=/var/lib/dnsmasq/dnsmasq.leases
+ 
+ # Set the DHCP server to authoritative mode. In this mode it will barge in
+ # and take over the lease for any client which broadcasts on the network,
+diff -up dnsmasq-2.48/man/dnsmasq.8.orig dnsmasq-2.48/man/dnsmasq.8
+--- dnsmasq-2.48/man/dnsmasq.8.orig	2009-06-03 15:58:30.000000000 -0500
++++ dnsmasq-2.48/man/dnsmasq.8	2009-06-10 07:13:33.000000000 -0500
+@@ -1249,7 +1249,7 @@ file needs a 1GHz processor and about 60
+ 
+ .IR /etc/ethers
+ 
+-.IR /var/lib/misc/dnsmasq.leases 
++.IR /var/lib/dnsmasq/dnsmasq.leases 
+ 
+ .IR /var/db/dnsmasq.leases
+ 
+diff -up dnsmasq-2.48/man/es/dnsmasq.8.orig dnsmasq-2.48/man/es/dnsmasq.8
+--- dnsmasq-2.48/man/es/dnsmasq.8.orig	2009-03-14 17:28:26.000000000 -0500
++++ dnsmasq-2.48/man/es/dnsmasq.8	2009-06-10 07:13:33.000000000 -0500
+@@ -1222,7 +1222,7 @@ un CPU de 1GHz y aproximadamente 60MB de
+ 
+ .IR /etc/ethers
+ 
+-.IR /var/lib/misc/dnsmasq.leases 
++.IR /var/lib/dnsmasq/dnsmasq.leases 
+ 
+ .IR /var/db/dnsmasq.leases
+ 
+diff -up dnsmasq-2.48/src/config.h.orig dnsmasq-2.48/src/config.h
+--- dnsmasq-2.48/src/config.h.orig	2009-05-29 04:23:48.000000000 -0500
++++ dnsmasq-2.48/src/config.h	2009-06-10 07:13:21.000000000 -0500
+@@ -45,7 +45,7 @@
+ #   elif defined(__sun__) || defined (__sun)
+ #      define LEASEFILE "/var/cache/dnsmasq.leases"
+ #   else
+-#      define LEASEFILE "/var/lib/misc/dnsmasq.leases"
++#      define LEASEFILE "/var/lib/dnsmasq/dnsmasq.leases"
+ #   endif
+ #endif
+ 
+@@ -163,7 +163,7 @@ NOTES:
+ #define HAVE_DHCP
+ #define HAVE_TFTP
+ /* #define HAVE_BROKEN_RTC */
+-/* #define HAVE_DBUS */
++#define HAVE_DBUS
+ 
+ /* Allow TFTP to be disabled with COPTS=-DNO_TFTP */
+ #ifdef NO_TFTP
