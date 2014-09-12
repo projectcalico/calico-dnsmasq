@@ -205,8 +205,8 @@ void icmp6_packet(time_t now)
 	my_syslog(MS_DHCP | LOG_INFO, "RTR-SOLICIT(%s) %s", interface, mac);
 
       /* If the incoming interface is an alias of some other one (as
-         specified by the --bridge-interfaces option), send an RA
-         using the context of the aliased interface. */
+         specified by the --bridge-interface option), send an RA using
+         the context of the aliased interface. */
       for (bridge = daemon->bridges; bridge; bridge = bridge->next)
         {
           int bridge_index = if_nametoindex(bridge->iface);
@@ -825,8 +825,8 @@ time_t periodic_ra(time_t now)
                         free(aparam.alias_ifs);
                       }
 
-                    /* The source interface can only appear in at most
-                       one --bridge-interfaces. */
+                    /* The source interface! can only appear in at most
+                       one --bridge-interface. */
                     break;
                   }
             }
