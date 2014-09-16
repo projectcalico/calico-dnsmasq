@@ -10,7 +10,7 @@
 %endif
 
 Name:           dnsmasq
-Version:        2.72_calico0.1
+Version:        2.72_calico0.4
 Release:        1%{?extraversion}%{?dist}
 Summary:        A lightweight DHCP/caching DNS server
 
@@ -144,6 +144,14 @@ fi
 %{_mandir}/man1/dhcp_*
 
 %changelog
+* Tue Sep 16 2014 Neil Jerram <nj@metaswitch.com> - 2.72_calico0.4
+- Updates for Calico/IPv6 connectivity:
+  - Implement aliasing idea (per --bridge-interfaces) for DHCPv6 as well as for v4
+  - Allow configuration of on-link (L) bit in Router Advertisement prefix option
+  - Implement aliasing idea (per --bridge-interfaces) for solicited Router Advertisements
+  - Implement aliasing for unsolicited router advertisements
+  - Documentation for IPv6 enhancements
+
 * Fri Jul 04 2014 Neil Jerram <nj@metaswitch.com> - 2.72_calico0.1
 - Packaging for Project Calico, based on latest upstream source
 
