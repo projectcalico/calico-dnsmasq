@@ -41,9 +41,10 @@ struct search_param {
 };
 
 struct alias_param {
-  time_t now; int iface;
+  int iface;
   struct dhcp_bridge *bridge;
   int num_alias_ifs;
+  int max_alias_ifs;
   int *alias_ifs;
 };
 
@@ -785,7 +786,8 @@ time_t periodic_ra(time_t now)
                     aparam.alias_ifs = NULL;
                     aparam.num_alias_ifs = 0;
                     iface_enumerate(AF_LOCAL, &aparam, send_ra_to_aliases);
-                    my_syslog(MS_DHCP | LOG_INFO, "RTR-ADVERT(%s) %s => %d alias(es)", param.name, daemon->addrbuff, aparam.num_alias_ifs);
+                    my_syslog(MS_DHCP | LOG_INFO, "RTR-ADVERT(%s) %s => %d alias(es)",
+                              param.name, daemon->addrbuff, aparam.num_alias_ifs);
 
                     /* Allocate memory to store the alias interface
                        indices. */
@@ -796,14 +798,20 @@ time_t periodic_ra(time_t now)
                         /* Use iface_enumerate again to get the alias
                            interface indices, then send on each of
                            those. */
+                        aparam.max_alias_ifs = aparam.num_alias_ifs;
                         aparam.num_alias_ifs = 0;
                         iface_enumerate(AF_LOCAL, &aparam, send_ra_to_aliases);
                         for (; aparam.num_alias_ifs; aparam.num_alias_ifs--)
-                          send_ra_alias(now,
-                                        param.iface,
-                                        param.name,
-                                        NULL,
-                                        aparam.alias_ifs[aparam.num_alias_ifs - 1]);
+                          {
+                            my_syslog(MS_DHCP | LOG_INFO, "RTR-ADVERT(%s) %s => i/f %d",
+                                      param.name, daemon->addrbuff,
+                                      aparam.alias_ifs[aparam.num_alias_ifs - 1]);
+                            send_ra_alias(now,
+                                          param.iface,
+                                          param.name,
+                                          NULL,
+                                          aparam.alias_ifs[aparam.num_alias_ifs - 1]);
+                          }
                         free(aparam.alias_ifs);
                       }
 
@@ -831,9 +839,9 @@ static int send_ra_to_aliases(int index, unsigned int type, char *mac, size_t ma
     for (alias = aparam->bridge->alias; alias; alias = alias->next)
       if (wildcard_matchn(alias->iface, ifrn_name, IFNAMSIZ))
         {
-          aparam->num_alias_ifs++;
-          if (aparam->alias_ifs)
+          if (aparam->alias_ifs && (aparam->num_alias_ifs < aparam->max_alias_ifs))
             aparam->alias_ifs[aparam->num_alias_ifs] = index;
+          aparam->num_alias_ifs++;
         }
 
   return 1;
