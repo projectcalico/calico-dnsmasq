@@ -209,6 +209,24 @@ void dhcp6_packet(time_t now)
       if (!daemon->doing_dhcp6)
 	return;
       
+      /* If we don't have any contexts based on the interface that the
+         DHCPv6 request was received on, see if that interface is an
+         alias of some other one (as specified by the
+         --bridge-interfaces option) and try again there. */
+      if (!parm.current)
+        {
+          struct dhcp_bridge *bridge, *alias;
+          for (bridge = daemon->bridges; bridge; bridge = bridge->next)
+            {
+              parm.ind = if_nametoindex(bridge->iface);
+              if (parm.ind)
+                for (alias = bridge->alias; alias; alias = alias->next)
+                  if (wildcard_matchn(alias->iface, ifr.ifr_name, IF_NAMESIZE))
+                    if (!iface_enumerate(AF_INET6, &parm, complete_context6))
+                      return;
+            }
+        }
+
       lease_prune(NULL, now); /* lose any expired leases */
       
       port = dhcp6_reply(parm.current, if_index, ifr.ifr_name, &parm.fallback, 
