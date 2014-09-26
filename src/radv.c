@@ -397,7 +397,7 @@ static void send_ra_alias(time_t now, int iface, char *iface_name, struct in6_ad
     }
 #endif
      
-  iface_enumerate(AF_LOCAL, &iface, add_lla);
+  iface_enumerate(AF_LOCAL, &send_iface, add_lla);
  
   /* RDNSS, RFC 6106, use relevant DHCP6 options */
   (void)option_filter(parm.tags, NULL, daemon->dhcp_opts6);
