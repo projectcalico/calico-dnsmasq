@@ -10,7 +10,7 @@
 %endif
 
 Name:           dnsmasq
-Version:        2.72_calico0.4
+Version:        2.72_calico0.4.1
 Release:        1%{?extraversion}%{?dist}
 Summary:        A lightweight DHCP/caching DNS server
 
@@ -144,6 +144,11 @@ fi
 %{_mandir}/man1/dhcp_*
 
 %changelog
+* Fri Sep 26 2014 Neil Jerram <nj@metaswitch.com> - 2.72_calico0.4.1
+- Fix for an intermittent Calico/IPv6 connectivity loss; please see
+  https://github.com/Metaswitch/calico/issues/14 for details:
+  - Set RA link-local addr correctly when sending on alias interface
+
 * Tue Sep 16 2014 Neil Jerram <nj@metaswitch.com> - 2.72_calico0.4
 - Updates for Calico/IPv6 connectivity:
   - Implement aliasing idea (per --bridge-interfaces) for DHCPv6 as well as for v4

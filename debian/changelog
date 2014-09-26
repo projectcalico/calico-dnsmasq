@@ -1,3 +1,11 @@
+dnsmasq (2.72-1-calico0.4.1) unstable; urgency=low
+
+   * Fix for an intermittent Calico/IPv6 connectivity loss; please see
+     https://github.com/Metaswitch/calico/issues/14 for details:
+     - Set RA link-local addr correctly when sending on alias interface
+
+ -- Neil Jerram <nj@metaswitch.com>  Fri, 26 Sep 2014 10:50:34 +0100
+
 dnsmasq (2.72-1-calico0.4) unstable; urgency=low
 
    * Updates for Calico/IPv6 connectivity:
