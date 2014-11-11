@@ -1,0 +1,29 @@
+Description: FreeBSD build fix
+ Representation as a patch of source code change made by dnsmasq_2.72-2.diff.
+Author: Simon Kelley <simon@thekelleys.org.uk>
+Bug-Debian: https://bugs.debian.org/763693
+
+---
+
+--- dnsmasq-2.72.orig/src/tables.c
++++ dnsmasq-2.72/src/tables.c
+@@ -20,6 +20,10 @@
+ 
+ #if defined(HAVE_IPSET) && defined(HAVE_BSD_NETWORK)
+ 
++#ifndef __FreeBSD__
++#include <bsd/string.h>
++#endif
++
+ #include <sys/types.h>
+ #include <sys/ioctl.h>
+ 
+@@ -136,7 +140,7 @@ int add_to_ipset(const char *setname, co
+       return -1;
+     }
+   
+-  if (rc = pfr_add_tables(&table, 1, &n, 0)) 
++  if ((rc = pfr_add_tables(&table, 1, &n, 0))) 
+     {
+       my_syslog(LOG_WARNING, _("warning: pfr_add_tables: %s(%d)"),
+ 		pfr_strerror(errno),rc);
