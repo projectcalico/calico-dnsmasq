@@ -162,7 +162,7 @@ int iface_check(int family, struct all_addr *addr, char *name, int *indexp)
       for (bridge = daemon->bridges; bridge; bridge = bridge->next)
 	{
 	  for (alias = bridge->alias; alias; alias = alias->next)
-	    if (wildcard_matchn(alias->iface, name, IF_NAMESIZE))
+	    if (strncmp(name, alias->iface, IF_NAMESIZE) == 0)
 	      {
 		int newindex;
 		

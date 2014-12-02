@@ -522,21 +522,3 @@ int read_write(int fd, unsigned char *packet, int size, int rw)
   return 1;
 }
 
-/* The same but comparing a maximum of NUM characters, like strncmp.  */
-int wildcard_matchn(const char* wildcard, const char* match, int num)
-{
-  while (*wildcard && *match && num)
-    {
-      if (*wildcard == '*')
-        return 1;
-
-      if (*wildcard != *match)
-        return 0; 
-
-      ++wildcard;
-      ++match;
-      --num;
-    }
-
-  return (!num) || (*wildcard == *match);
-}
