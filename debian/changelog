@@ -1,3 +1,9 @@
+dnsmasq (2.59-4ubuntu0.1calico0.8) precise; urgency=low
+
+  * Allow wildcard aliases in --bridge-interface option.
+
+ -- Matt Dupre <matthew.dupre@metaswitch.com>  Tue, 2 Dec 2014 17:22:31 +0000
+
 dnsmasq (2.59-4ubuntu0.1) precise-proposed; urgency=low
 
   * debian/rules: install the dnsmasq dbus configuration in dnsmasq-base, since
