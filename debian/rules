@@ -79,10 +79,6 @@ ifneq (,$(filter uselua,$(DEB_BUILD_OPTIONS)))
      DEB_COPTS += -DHAVE_LUASCRIPT
 endif
 
-ifeq (,$(filter nodnssec,$(DEB_BUILD_OPTIONS)))
-     DEB_COPTS += -DHAVE_DNSSEC
-endif
-
 ifneq ($(DEB_HOST_ARCH_OS),linux)
      # For strlcpy in FreeBSD
      LDFLAGS += -lbsd
