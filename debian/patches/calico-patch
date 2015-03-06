@@ -1,0 +1,467 @@
+Index: calico-dnsmasq/man/dnsmasq.8
+===================================================================
+--- calico-dnsmasq.orig/man/dnsmasq.8	2015-03-06 18:19:36.744450585 +0000
++++ calico-dnsmasq/man/dnsmasq.8	2015-03-06 18:20:36.041165058 +0000
+@@ -804,7 +804,7 @@
+ for details.)
+ 
+ For IPv6, the mode may be some combination of
+-.B ra-only, slaac, ra-names, ra-stateless, ra-advrouter.
++.B ra-only, slaac, ra-names, ra-stateless, ra-advrouter, off-link.
+ 
+ .B ra-only
+ tells dnsmasq to offer Router Advertisement only on this subnet,
+@@ -844,6 +844,9 @@
+ This is described in RFC-3775 section 7.2 and is used in mobile IPv6. In this mode the interval option
+ is also included, as described in RFC-3775 section 7.3.
+ 
++.B off-link
++tells dnsmasq to advertise the prefix without the on-link (aka L) bit set.
++
+ .TP
+ .B \-G, --dhcp-host=[<hwaddr>][,id:<client_id>|*][,set:<tag>][,<ipaddr>][,<hostname>][,<lease_time>][,ignore]
+ Specify per host parameters for the DHCP server. This allows a machine
+@@ -1556,11 +1559,13 @@
+ to the client-id and lease length and expiry time.
+ .TP
+ .B --bridge-interface=<interface>,<alias>[,<alias>]
+-Treat DHCP request packets arriving at any of the <alias> interfaces
+-as if they had arrived at <interface>. This option is necessary when
+-using "old style" bridging on BSD platforms, since
+-packets arrive at tap interfaces which don't have an IP address.
+-A trailing '*' wildcard can be used in each <alias>.
++Treat DHCP (v4 and v6) request and IPv6 Router Solicit packets
++arriving at any of the <alias> interfaces as if they had arrived at
++<interface>.  This option allows dnsmasq to provide DHCP and RA
++service over unaddressed and unbridged Ethernet interfaces, e.g. on an
++OpenStack compute host where each such interface is a TAP interface to
++a VM, or as in "old style bridging" on BSD platforms.  A trailing '*'
++wildcard can be used in each <alias>.
+ .TP
+ .B \-s, --domain=<domain>[,<address range>[,local]]
+ Specifies DNS domains for the DHCP server. Domains may be be given 
+Index: calico-dnsmasq/man/es/dnsmasq.8
+===================================================================
+--- calico-dnsmasq.orig/man/es/dnsmasq.8	2015-03-06 18:19:36.744450585 +0000
++++ calico-dnsmasq/man/es/dnsmasq.8	2015-03-06 18:20:36.041165058 +0000
+@@ -1062,10 +1062,14 @@
+ cuando hay cambios hechos a el client-id y tiempos de arriendo y vencimiento.
+ .TP
+ .B --bridge-interface=<nombre de interface>,<alias>[,<alias>]
+-Tratar paquetes de pedidos DHCP que llegan a cualquiera de las interfaces <alias>
+-como si hubieran llegado a la interface <nombre de interface>. Esta opci�n
+-es necesaria al usar bridging estilo viejo en plataformas BSD, dado a que
+-los paquetes llegan a interfaces tap que no tienen una direcci�n IP.
++Tratar paquetes de pedidos DHCP (v4 y v6) y de IPv6 Router Solicit que
++llegan a cualquiera de las interfaces <alias> como si hubieran llegado
++a la interface <nombre de interface>.  Esta opci�n permite que dnsmasq
++puede proporcionar los servicios DHCP y RA a trav�s de interfaces
++ethernet sin direcci�n y sin puente; por ejemplo en un nodo de c�lculo
++de OpenStack, donde cada una de esas interfaces es una interfaz TAP
++para una m�quina virtual, o al usar bridging estilo viejo en
++plataformas BSD.
+ .TP
+ .B \-s, --domain=<dominio>[,<rango de IPs>]
+ Especifica los dominios DNS para el servidor DHCP. Dominios pueden ser
+Index: calico-dnsmasq/man/fr/dnsmasq.8
+===================================================================
+--- calico-dnsmasq.orig/man/fr/dnsmasq.8	2015-03-06 18:19:36.744450585 +0000
++++ calico-dnsmasq/man/fr/dnsmasq.8	2015-03-06 18:20:36.041165058 +0000
+@@ -852,7 +852,7 @@
+ pour plus de détails).
+ 
+ Pour IPv6, le mode peut-être une combinaison des valeurs
+-.B ra-only, slaac, ra-names, ra-stateless.
++.B ra-only, slaac, ra-names, ra-stateless, off-link.
+ 
+ .B ra-only
+ indique à dnsmasq de n'effectuer que des annonces de routeur (Router
+@@ -888,6 +888,9 @@
+ et
+ .B slaac.
+ 
++.B off-link
++indique à dnsmasq d'annoncer le préfixe sans le bit L (sur lien).
++
+ .TP
+ .B \-G, --dhcp-host=[<adresse matérielle>][,id:<identifiant client>|*][,set:<label>][,<adresse IP>][,<nom d'hôte>][,<durée de bail>][,ignore]
+ Spécifie les paramètres DHCP relatifs à un hôte. Cela permet à une machine
+@@ -1655,11 +1658,14 @@
+ longueur de bail ou de date d'expiration.
+ .TP
+ .B --bridge-interface=<interface>,<alias>[,<alias>]
+-Traiter les requêtes DHCP arrivant sur n'importe laquelle des interfaces <alias>
+-comme si elles arrivaient de l'interface <interface>. Cette option est
+-nécessaire lors de l'utilisation de pont ethernet "ancien mode" sur plate-forme
+-BSD, puisque dans ce cas les paquets arrivent sur des interfaces "tap" n'ont
+-pas d'adresse IP.  Chaque <alias> peut finir avec un simple '*' joker.
++Traiter les requêtes DHCP (v4 et v6) et IPv6 Router Solicit arrivant
++sur n'importe laquelle des interfaces <alias> comme si elles
++arrivaient de l'interface <interface>. Cette option permet à dnsmasq
++de fournir les service DHCP et RA sur les interfaces ethernet non
++adressés et non pontés; par exemple sur un hôte de calcul d'OpenStack
++où chaque telle interface est une interface TAP à une machine
++virtuelle, ou lors de l'utilisation de pont ethernet "ancien mode" sur
++plate-forme BSD.  Chaque <alias> peut finir avec un simple '*' joker.
+ .TP
+ .B \-s, --domain=<domaine>[,<gamme d'adresses>[,local]]
+ Spécifie le domaine du serveur DHCP. Le domaine peut être donné de manière
+Index: calico-dnsmasq/src/auth.c
+===================================================================
+--- calico-dnsmasq.orig/src/auth.c	2015-03-06 18:19:36.744450585 +0000
++++ calico-dnsmasq/src/auth.c	2015-03-06 18:20:36.041165058 +0000
+@@ -409,7 +409,10 @@
+ 		peer_addr->in.sin_port = 0;
+ #ifdef HAVE_IPV6
+ 	      else
+-		peer_addr->in6.sin6_port = 0; 
++		{
++		  peer_addr->in6.sin6_port = 0; 
++		  peer_addr->in6.sin6_scope_id = 0;
++		}
+ #endif
+ 	      
+ 	      for (peers = daemon->auth_peers; peers; peers = peers->next)
+Index: calico-dnsmasq/src/dhcp.c
+===================================================================
+--- calico-dnsmasq.orig/src/dhcp.c	2015-03-06 18:19:36.744450585 +0000
++++ calico-dnsmasq/src/dhcp.c	2015-03-06 18:20:36.041165058 +0000
+@@ -225,10 +225,11 @@
+   strncpy(arp_req.arp_dev, ifr.ifr_name, 16);
+ #endif 
+ 
+-   /* One form of bridging on BSD has the property that packets
+-      can be recieved on bridge interfaces which do not have an IP address.
+-      We allow these to be treated as aliases of another interface which does have
+-      an IP address with --dhcp-bridge=interface,alias,alias */
++  /* If the interface on which the DHCP request was received is an
++     alias of some other interface (as specified by the
++     --bridge-interface option), change ifr.ifr_name so that we look
++     for DHCP contexts associated with the aliased interface instead
++     of with the aliasing one. */
+   for (bridge = daemon->bridges; bridge; bridge = bridge->next)
+     {
+       for (alias = bridge->alias; alias; alias = alias->next)
+Index: calico-dnsmasq/src/dhcp6.c
+===================================================================
+--- calico-dnsmasq.orig/src/dhcp6.c	2015-03-06 18:19:36.744450585 +0000
++++ calico-dnsmasq/src/dhcp6.c	2015-03-06 18:20:36.041165058 +0000
+@@ -144,6 +144,8 @@
+ 
+   if ((port = relay_reply6(&from, sz, ifr.ifr_name)) == 0)
+     {
++      struct dhcp_bridge *bridge, *alias;
++
+       for (tmp = daemon->if_except; tmp; tmp = tmp->next)
+ 	if (tmp->name && wildcard_match(tmp->name, ifr.ifr_name))
+ 	  return;
+@@ -160,6 +162,23 @@
+       memset(&parm.fallback, 0, IN6ADDRSZ);
+       memset(&parm.ll_addr, 0, IN6ADDRSZ);
+       memset(&parm.ula_addr, 0, IN6ADDRSZ);
++
++      /* If the interface on which the DHCPv6 request was received is
++         an alias of some other interface (as specified by the
++         --bridge-interface option), change parm.ind so that we look
++         for DHCPv6 contexts associated with the aliased interface
++         instead of with the aliasing one. */
++      for (bridge = daemon->bridges; bridge; bridge = bridge->next)
++	{
++	  for (alias = bridge->alias; alias; alias = alias->next)
++	    if (wildcard_matchn(alias->iface, ifr.ifr_name, IF_NAMESIZE))
++	      {
++		parm.ind = if_nametoindex(bridge->iface);
++		break;
++	      }
++	  if (alias)
++	    break;
++	}
+       
+       for (context = daemon->dhcp6; context; context = context->next)
+ 	if (IN6_IS_ADDR_UNSPECIFIED(&context->start6) && context->prefix == 0)
+@@ -208,7 +227,7 @@
+       /* May have configured relay, but not DHCP server */
+       if (!daemon->doing_dhcp6)
+ 	return;
+-      
++
+       lease_prune(NULL, now); /* lose any expired leases */
+       
+       port = dhcp6_reply(parm.current, if_index, ifr.ifr_name, &parm.fallback, 
+Index: calico-dnsmasq/src/dnsmasq.h
+===================================================================
+--- calico-dnsmasq.orig/src/dnsmasq.h	2015-03-06 18:19:36.744450585 +0000
++++ calico-dnsmasq/src/dnsmasq.h	2015-03-06 18:20:36.041165058 +0000
+@@ -847,6 +847,7 @@
+ #define CONTEXT_USED           (1u<<15)
+ #define CONTEXT_OLD            (1u<<16)
+ #define CONTEXT_V6             (1u<<17)
++#define CONTEXT_RA_OFF_LINK    (1u<<18)
+ 
+ struct ping_result {
+   struct in_addr addr;
+Index: calico-dnsmasq/src/option.c
+===================================================================
+--- calico-dnsmasq.orig/src/option.c	2015-03-06 18:19:36.748450587 +0000
++++ calico-dnsmasq/src/option.c	2015-03-06 18:20:36.045165219 +0000
+@@ -2620,6 +2620,8 @@
+ 		  new->flags |= CONTEXT_RA_ROUTER | CONTEXT_RA;
+ 		else if (strcmp(a[leasepos], "ra-stateless") == 0)
+ 		  new->flags |= CONTEXT_RA_STATELESS | CONTEXT_DHCP | CONTEXT_RA;
++		else if (strcmp(a[leasepos], "off-link") == 0)
++		  new->flags |= CONTEXT_RA_OFF_LINK;
+ 		else if (leasepos == 1 && inet_pton(AF_INET6, a[leasepos], &new->end6))
+ 		  new->flags |= CONTEXT_DHCP; 
+ 		else if (strstr(a[leasepos], "constructor:") == a[leasepos])
+Index: calico-dnsmasq/src/radv.c
+===================================================================
+--- calico-dnsmasq.orig/src/radv.c	2015-03-06 18:19:36.748450587 +0000
++++ calico-dnsmasq/src/radv.c	2015-03-06 18:20:36.045165219 +0000
+@@ -40,7 +40,18 @@
+   char name[IF_NAMESIZE+1];
+ };
+ 
++struct alias_param {
++  int iface;
++  struct dhcp_bridge *bridge;
++  int num_alias_ifs;
++  int max_alias_ifs;
++  int *alias_ifs;
++};
++
+ static void send_ra(time_t now, int iface, char *iface_name, struct in6_addr *dest);
++static void send_ra_alias(time_t now, int iface, char *iface_name, struct in6_addr *dest,
++                    int send_iface);
++static int send_ra_to_aliases(int index, unsigned int type, char *mac, size_t maclen, void *parm);
+ static int add_prefixes(struct in6_addr *local,  int prefix,
+ 			int scope, int if_index, int flags, 
+ 			unsigned int preferred, unsigned int valid, void *vparam);
+@@ -181,6 +192,7 @@
+   else if (packet[0] == ND_ROUTER_SOLICIT)
+     {
+       char *mac = "";
++      struct dhcp_bridge *bridge, *alias;
+       
+       /* look for link-layer address option for logging */
+       if (sz >= 16 && packet[8] == ICMP6_OPT_SOURCE_MAC && (packet[9] * 8) + 8 <= sz)
+@@ -191,12 +203,37 @@
+          
+       if (!option_bool(OPT_QUIET_RA))
+ 	my_syslog(MS_DHCP | LOG_INFO, "RTR-SOLICIT(%s) %s", interface, mac);
+-      /* source address may not be valid in solicit request. */
+-      send_ra(now, if_index, interface, !IN6_IS_ADDR_UNSPECIFIED(&from.sin6_addr) ? &from.sin6_addr : NULL);
++
++      /* If the incoming interface is an alias of some other one (as
++         specified by the --bridge-interface option), send an RA using
++         the context of the aliased interface. */
++      for (bridge = daemon->bridges; bridge; bridge = bridge->next)
++        {
++          int bridge_index = if_nametoindex(bridge->iface);
++          if (bridge_index)
++	    {
++	      for (alias = bridge->alias; alias; alias = alias->next)
++		if (wildcard_matchn(alias->iface, interface, IF_NAMESIZE))
++		  {
++		    /* Send an RA on if_index with information from
++		       bridge_index. */
++		    send_ra_alias(now, bridge_index, bridge->iface, NULL, if_index);
++		    break;
++		  }
++	      if (alias)
++		break;
++	    }
++        }
++
++      /* If the incoming interface wasn't an alias, send an RA using
++	 the context of the incoming interface. */
++      if (!bridge)
++	/* source address may not be valid in solicit request. */
++	send_ra(now, if_index, interface, !IN6_IS_ADDR_UNSPECIFIED(&from.sin6_addr) ? &from.sin6_addr : NULL);
+     }
+ }
+ 
+-static void send_ra(time_t now, int iface, char *iface_name, struct in6_addr *dest)
++static void send_ra_alias(time_t now, int iface, char *iface_name, struct in6_addr *dest, int send_iface)
+ {
+   struct ra_packet *ra;
+   struct ra_param parm;
+@@ -313,8 +350,10 @@
+ 		  opt->type = ICMP6_OPT_PREFIX;
+ 		  opt->len = 4;
+ 		  opt->prefix_len = context->prefix;
+-		  /* autonomous only if we're not doing dhcp, always set "on-link" */
+-		  opt->flags = do_slaac ? 0xC0 : 0x80;
++		  /* autonomous only if we're not doing dhcp, set
++                     "on-link" unless "off-link" was specified */
++		  opt->flags = (do_slaac ? 0x40 : 0) |
++                    ((context->flags & CONTEXT_RA_OFF_LINK) ? 0 : 0x80);
+ 		  opt->valid_lifetime = htonl(context->saved_valid - old);
+ 		  opt->preferred_lifetime = htonl(0);
+ 		  opt->reserved = 0; 
+@@ -368,7 +407,7 @@
+     }
+ #endif
+      
+-  iface_enumerate(AF_LOCAL, &iface, add_lla);
++  iface_enumerate(AF_LOCAL, &send_iface, add_lla);
+  
+   /* RDNSS, RFC 6106, use relevant DHCP6 options */
+   (void)option_filter(parm.tags, NULL, daemon->dhcp_opts6);
+@@ -476,7 +515,7 @@
+   else
+     {
+       inet_pton(AF_INET6, ALL_NODES, &addr.sin6_addr); 
+-      setsockopt(daemon->icmp6fd, IPPROTO_IPV6, IPV6_MULTICAST_IF, &iface, sizeof(iface));
++      setsockopt(daemon->icmp6fd, IPPROTO_IPV6, IPV6_MULTICAST_IF, &send_iface, sizeof(send_iface));
+     }
+   
+   while (sendto(daemon->icmp6fd, daemon->outpacket.iov_base, save_counter(0), 0, 
+@@ -484,6 +523,13 @@
+   
+ }
+ 
++static void send_ra(time_t now, int iface, char *iface_name, struct in6_addr *dest)
++{
++  /* Send an RA on the same interface that the RA content is based
++     on. */
++  send_ra_alias(now, iface, iface_name, dest, iface);
++}
++
+ static int add_prefixes(struct in6_addr *local,  int prefix,
+ 			int scope, int if_index, int flags, 
+ 			unsigned int preferred, unsigned int valid, void *vparam)
+@@ -513,6 +559,7 @@
+ 	  int deprecate  = 0;
+ 	  int constructed = 0;
+ 	  int adv_router = 0;
++	  int off_link = 0;
+ 	  unsigned int time = 0xffffffff;
+ 	  struct dhcp_context *context;
+ 	  
+@@ -585,6 +632,7 @@
+ 		      context->ra_time = 0;
+ 		    context->flags |= CONTEXT_RA_DONE;
+ 		    real_prefix = context->prefix;
++                    off_link = (context->flags & CONTEXT_RA_OFF_LINK);
+ 		  }
+ 
+ 		param->first = 0;	
+@@ -635,8 +683,9 @@
+ 		  opt->type = ICMP6_OPT_PREFIX;
+ 		  opt->len = 4;
+ 		  opt->prefix_len = real_prefix;
+-		  /* autonomous only if we're not doing dhcp, always set "on-link" */
+-		  opt->flags = 0x80;
++		  /* autonomous only if we're not doing dhcp, set
++                     "on-link" unless "off-link" was specified */
++		  opt->flags = (off_link ? 0 : 0x80);
+ 		  if (do_slaac)
+ 		    opt->flags |= 0x40;
+ 		  if (adv_router)
+@@ -682,6 +731,7 @@
+   struct search_param param;
+   struct dhcp_context *context;
+   time_t next_event;
++  struct alias_param aparam;
+     
+   param.now = now;
+   param.iface = 0;
+@@ -729,12 +779,84 @@
+ 	    if (tmp->name && wildcard_match(tmp->name, param.name))
+ 	      break;
+ 	  if (!tmp)
+-	    send_ra(now, param.iface, param.name, NULL); 
++            {
++              send_ra(now, param.iface, param.name, NULL); 
++
++              /* Also send on all interfaces that are aliases of this
++                 one. */
++              for (aparam.bridge = daemon->bridges;
++                   aparam.bridge;
++                   aparam.bridge = aparam.bridge->next)
++                if ((int)if_nametoindex(aparam.bridge->iface) == param.iface)
++                  {
++                    /* Count the number of alias interfaces for this
++                       'bridge', by calling iface_enumerate with
++                       send_ra_to_aliases and NULL alias_ifs. */
++                    aparam.iface = param.iface;
++                    aparam.alias_ifs = NULL;
++                    aparam.num_alias_ifs = 0;
++                    iface_enumerate(AF_LOCAL, &aparam, send_ra_to_aliases);
++                    my_syslog(MS_DHCP | LOG_INFO, "RTR-ADVERT(%s) %s => %d alias(es)",
++                              param.name, daemon->addrbuff, aparam.num_alias_ifs);
++
++                    /* Allocate memory to store the alias interface
++                       indices. */
++                    aparam.alias_ifs = (int *)whine_malloc(aparam.num_alias_ifs *
++                                                           sizeof(int));
++                    if (aparam.alias_ifs)
++                      {
++                        /* Use iface_enumerate again to get the alias
++                           interface indices, then send on each of
++                           those. */
++                        aparam.max_alias_ifs = aparam.num_alias_ifs;
++                        aparam.num_alias_ifs = 0;
++                        iface_enumerate(AF_LOCAL, &aparam, send_ra_to_aliases);
++                        for (; aparam.num_alias_ifs; aparam.num_alias_ifs--)
++                          {
++                            my_syslog(MS_DHCP | LOG_INFO, "RTR-ADVERT(%s) %s => i/f %d",
++                                      param.name, daemon->addrbuff,
++                                      aparam.alias_ifs[aparam.num_alias_ifs - 1]);
++                            send_ra_alias(now,
++                                          param.iface,
++                                          param.name,
++                                          NULL,
++                                          aparam.alias_ifs[aparam.num_alias_ifs - 1]);
++                          }
++                        free(aparam.alias_ifs);
++                      }
++
++                    /* The source interface! can only appear in at most
++                       one --bridge-interface. */
++                    break;
++                  }
++            }
+ 	}
+     }      
+   return next_event;
+ }
+-  
++
++static int send_ra_to_aliases(int index, unsigned int type, char *mac, size_t maclen, void *parm)
++{
++  struct alias_param *aparam = (struct alias_param *)parm;
++  char ifrn_name[IFNAMSIZ];
++  struct dhcp_bridge *alias;
++
++  (void)type;
++  (void)mac;
++  (void)maclen;
++
++  if (if_indextoname(index, ifrn_name))
++    for (alias = aparam->bridge->alias; alias; alias = alias->next)
++      if (wildcard_matchn(alias->iface, ifrn_name, IFNAMSIZ))
++        {
++          if (aparam->alias_ifs && (aparam->num_alias_ifs < aparam->max_alias_ifs))
++            aparam->alias_ifs[aparam->num_alias_ifs] = index;
++          aparam->num_alias_ifs++;
++        }
++
++  return 1;
++}
++
+ static int iface_search(struct in6_addr *local,  int prefix,
+ 			int scope, int if_index, int flags, 
+ 			int preferred, int valid, void *vparam)
+Index: calico-dnsmasq/src/util.c
+===================================================================
+--- calico-dnsmasq.orig/src/util.c	2015-03-06 18:19:36.748450587 +0000
++++ calico-dnsmasq/src/util.c	2015-03-06 18:20:36.045165219 +0000
+@@ -274,6 +274,7 @@
+ #ifdef HAVE_IPV6      
+       if (s1->sa.sa_family == AF_INET6 &&
+ 	  s1->in6.sin6_port == s2->in6.sin6_port &&
++	  s1->in6.sin6_scope_id == s2->in6.sin6_scope_id &&
+ 	  IN6_ARE_ADDR_EQUAL(&s1->in6.sin6_addr, &s2->in6.sin6_addr))
+ 	return 1;
+ #endif
