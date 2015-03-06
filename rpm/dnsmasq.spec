@@ -10,7 +10,7 @@
 %endif
 
 Name:           dnsmasq
-Version:        2.72_calico0.4.1
+Version:        2.72_calico0.13
 Release:        1%{?extraversion}%{?dist}
 Summary:        A lightweight DHCP/caching DNS server
 
@@ -42,13 +42,13 @@ Requires(preun): /sbin/chkconfig
 Requires(preun): /sbin/service
 
 %description
-Dnsmasq is lightweight, easy to configure DNS forwarder and DHCP server. 
-It is designed to provide DNS and, optionally, DHCP, to a small network. 
-It can serve the names of local machines which are not in the global 
-DNS. The DHCP server integrates with the DNS server and allows machines 
-with DHCP-allocated addresses to appear in the DNS with names configured 
-either in each host or in a central configuration file. Dnsmasq supports 
-static and dynamic DHCP leases and BOOTP for network booting of diskless 
+Dnsmasq is lightweight, easy to configure DNS forwarder and DHCP server.
+It is designed to provide DNS and, optionally, DHCP, to a small network.
+It can serve the names of local machines which are not in the global
+DNS. The DHCP server integrates with the DNS server and allows machines
+with DHCP-allocated addresses to appear in the DNS with names configured
+either in each host or in a central configuration file. Dnsmasq supports
+static and dynamic DHCP leases and BOOTP for network booting of diskless
 machines.
 
 %package        utils
