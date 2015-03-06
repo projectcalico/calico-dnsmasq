@@ -225,11 +225,10 @@ void dhcp_packet(time_t now, int pxe_fd)
   strncpy(arp_req.arp_dev, ifr.ifr_name, 16);
 #endif 
 
-  /* If the interface on which the DHCP request was received is an
-     alias of some other interface (as specified by the
-     --bridge-interface option), change ifr.ifr_name so that we look
-     for DHCP contexts associated with the aliased interface instead
-     of with the aliasing one. */
+   /* One form of bridging on BSD has the property that packets
+      can be recieved on bridge interfaces which do not have an IP address.
+      We allow these to be treated as aliases of another interface which does have
+      an IP address with --dhcp-bridge=interface,alias,alias */
   for (bridge = daemon->bridges; bridge; bridge = bridge->next)
     {
       for (alias = bridge->alias; alias; alias = alias->next)
