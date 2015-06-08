@@ -10,7 +10,7 @@
 %endif
 
 Name:           dnsmasq
-Version:        2.72_calico0.13
+Version:        2.72_calico0.24
 Release:        1%{?extraversion}%{?dist}
 Summary:        A lightweight DHCP/caching DNS server
 
@@ -144,6 +144,9 @@ fi
 %{_mandir}/man1/dhcp_*
 
 %changelog
+* Mon Jun 15 2015 Matt Dupre <matt@projectcalico.org> - 2.72_calico0.24
+- Sync IPv6 enhancement code with what we've submitted to upstream dnsmasq project
+
 * Fri Mar 06 2015 Matt Dupre <matt@projectcalico.org> - 2.72_calico0.13
 - Cope with multiple interfaces with the same LL address
 
