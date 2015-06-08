@@ -144,6 +144,9 @@ fi
 %{_mandir}/man1/dhcp_*
 
 %changelog
+* Fri Mar 06 2015 Matt Dupre <matt@projectcalico.org> - 2.72_calico0.13
+- Cope with multiple interfaces with the same LL address
+
 * Fri Sep 26 2014 Neil Jerram <nj@metaswitch.com> - 2.72_calico0.4.1
 - Fix for an intermittent Calico/IPv6 connectivity loss; please see
   https://github.com/Metaswitch/calico/issues/14 for details:
