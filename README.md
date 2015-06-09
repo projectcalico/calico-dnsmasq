@@ -6,7 +6,7 @@ calico\_`TAG` or `DISTRIBUTION`\_`TAG`, where
 - `TAG` is the upstream (Simon Kelley) version number, such as 2.72
 
 - `DISTRIBUTION` names the distribution that the branch's code aims to
-  be installed on, such as "ubuntu" or "rhel7".
+  be installed on, such as "ubuntu" or "rpm".
 
 calico\_`TAG` branches contain Calico-specific changes to the upstream
 code.  `DISTRIBUTION`\_`TAG` branches incorporate those code changes
@@ -27,11 +27,10 @@ distribution:
   (Trusty).
 
 - calico\_2.72 and ubuntu\_2.72\_no\_dnssec, for installing Calico
-  using Mirantis Fuel 5.1.
+  using Mirantis Fuel 5.1 or 6.1.
 
-- master, for installation on Red Hat Enterprise Linux 7.  (This
-  branch is an exception to the general scheme described above, as it
-  combines code changes and RPM packaging work in the same branch.)
+- calico\_2.72 and rpm\_2.72, for installation on Red Hat Enterprise
+  Linux 7.
 
 Please do contact us via http://www.projectcalico.org/community/, for
 help with rebasing or applying Calico patches to other upstream
