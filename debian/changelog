@@ -1,3 +1,9 @@
+dnsmasq (2.72-2calico1.0.0+1) trusty; urgency=low
+
+   * Calico version 1.0.0 release
+
+ -- Matt Dupre <matt@projectcalico.org>  Fri, 14 Aug 2015 12:12:40 +0100
+
 dnsmasq (2.72-2calico0.13) trusty; urgency=low
 
    * Implement aliasing idea (per --bridge-interfaces) for DHCPv6 as well as for v4
