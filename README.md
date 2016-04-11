@@ -32,6 +32,9 @@ distribution:
 - calico\_2.72 and rpm\_2.72, for installation on Red Hat Enterprise
   Linux 7.
 
+- calico\_2.75 and ubuntu\_2.75, for installation on Ubuntu 16.04
+  (Xenial).
+
 Please do contact us via http://www.projectcalico.org/community/, for
 help with rebasing or applying Calico patches to other upstream
 releases, or with targeting other distributions.
