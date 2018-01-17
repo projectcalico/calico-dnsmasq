@@ -1,0 +1,93 @@
+From c3d10a1132ada7baa80914f61abb720f94400465 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20Men=C5=A1=C3=ADk?= <pemensik@redhat.com>
+Date: Tue, 14 Mar 2017 15:23:22 +0100
+Subject: [PATCH 1/2] Warn when using label in default mode
+
+---
+ src/dnsmasq.c |  2 ++
+ src/dnsmasq.h |  3 ++-
+ src/network.c | 13 +++++++++++++
+ 3 files changed, 17 insertions(+), 1 deletion(-)
+
+diff --git a/src/dnsmasq.c b/src/dnsmasq.c
+index 456b0e8..d2cc7cc 100644
+--- a/src/dnsmasq.c
++++ b/src/dnsmasq.c
+@@ -771,6 +771,8 @@ int main (int argc, char **argv)
+ 
+   if (option_bool(OPT_NOWILD))
+     warn_bound_listeners();
++  else if (!option_bool(OPT_CLEVERBIND))
++    warn_wild_labels();
+ 
+   warn_int_names();
+   
+diff --git a/src/dnsmasq.h b/src/dnsmasq.h
+index a27fbc1..6b44e53 100644
+--- a/src/dnsmasq.h
++++ b/src/dnsmasq.h
+@@ -522,7 +522,7 @@ struct ipsets {
+ struct irec {
+   union mysockaddr addr;
+   struct in_addr netmask; /* only valid for IPv4 */
+-  int tftp_ok, dhcp_ok, mtu, done, warned, dad, dns_auth, index, multicast_done, found;
++  int tftp_ok, dhcp_ok, mtu, done, warned, dad, dns_auth, index, multicast_done, found, label;
+   char *name; 
+   struct irec *next;
+ };
+@@ -1252,6 +1252,7 @@ int enumerate_interfaces(int reset);
+ void create_wildcard_listeners(void);
+ void create_bound_listeners(int die);
+ void warn_bound_listeners(void);
++void warn_wild_labels(void);
+ void warn_int_names(void);
+ int is_dad_listeners(void);
+ int iface_check(int family, struct all_addr *addr, char *name, int *auth_dns);
+diff --git a/src/network.c b/src/network.c
+index eb41624..e5ceb76 100644
+--- a/src/network.c
++++ b/src/network.c
+@@ -244,6 +244,7 @@ static int iface_allowed(struct iface_param *param, int if_index, char *label,
+   int tftp_ok = !!option_bool(OPT_TFTP);
+   int dhcp_ok = 1;
+   int auth_dns = 0;
++  int is_label = 0;
+ #if defined(HAVE_DHCP) || defined(HAVE_TFTP)
+   struct iname *tmp;
+ #endif
+@@ -264,6 +265,8 @@ static int iface_allowed(struct iface_param *param, int if_index, char *label,
+   
+   if (!label)
+     label = ifr.ifr_name;
++  else
++    is_label = strcmp(label, ifr.ifr_name);
+  
+   /* maintain a list of all addresses on all interfaces for --local-service option */
+   if (option_bool(OPT_LOCAL_SERVICE))
+@@ -482,6 +485,7 @@ static int iface_allowed(struct iface_param *param, int if_index, char *label,
+       iface->found = 1;
+       iface->done = iface->multicast_done = iface->warned = 0;
+       iface->index = if_index;
++      iface->label = is_label;
+       if ((iface->name = whine_malloc(strlen(ifr.ifr_name)+1)))
+ 	{
+ 	  strcpy(iface->name, ifr.ifr_name);
+@@ -1034,6 +1038,15 @@ void warn_bound_listeners(void)
+     my_syslog(LOG_WARNING, _("LOUD WARNING: use --bind-dynamic rather than --bind-interfaces to avoid DNS amplification attacks via these interface(s)")); 
+ }
+ 
++void warn_wild_labels(void)
++{
++  struct irec *iface;
++
++  for (iface = daemon->interfaces; iface; iface = iface->next)
++    if (iface->found && iface->name && iface->label)
++      my_syslog(LOG_WARNING, _("warning: using interface %s instead"), iface->name);
++}
++
+ void warn_int_names(void)
+ {
+   struct interface_name *intname;
+-- 
+2.9.3
+

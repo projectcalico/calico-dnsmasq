@@ -1,0 +1,60 @@
+From 13dee6f49e1d035b8069947be84ee8da2af0c420 Mon Sep 17 00:00:00 2001
+From: Simon Kelley <simon@thekelleys.org.uk>
+Date: Tue, 28 Feb 2017 16:51:58 +0000
+Subject: [PATCH] Compilation warning fixes.
+
+---
+ src/dbus.c   | 9 ++++-----
+ src/option.c | 3 ++-
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/src/dbus.c b/src/dbus.c
+index 7e0d342..2e1a48e 100644
+--- a/src/dbus.c
++++ b/src/dbus.c
+@@ -549,17 +549,16 @@ static DBusMessage *dbus_add_lease(DBusMessage* message)
+     return dbus_message_new_error_printf(message, DBUS_ERROR_INVALID_ARGS,
+ 					 "Invalid IP address '%s'", ipaddr);
+    
+-  hw_len = parse_hex((char*)hwaddr, dhcp_chaddr, DHCP_CHADDR_MAX, NULL,
+-		     &hw_type);
++  hw_len = parse_hex((char*)hwaddr, dhcp_chaddr, DHCP_CHADDR_MAX, NULL, &hw_type);
+   if (hw_type == 0 && hw_len != 0)
+     hw_type = ARPHRD_ETHER;
+-
+-    lease_set_hwaddr(lease, dhcp_chaddr, clid, hw_len, hw_type,
++  
++  lease_set_hwaddr(lease, dhcp_chaddr, clid, hw_len, hw_type,
+                    clid_len, now, 0);
+   lease_set_expires(lease, expires, now);
+   if (hostname_len != 0)
+     lease_set_hostname(lease, hostname, 0, get_domain(lease->addr), NULL);
+-    
++  
+   lease_update_file(now);
+   lease_update_dns(0);
+ 
+diff --git a/src/option.c b/src/option.c
+index 4a5ef5f..e03b1e3 100644
+--- a/src/option.c
++++ b/src/option.c
+@@ -4089,7 +4089,7 @@ static void read_file(char *file, FILE *f, int hard_opt)
+     {
+       int white, i;
+       volatile int option = (hard_opt == LOPT_REV_SERV) ? 0 : hard_opt;
+-      char *errmess, *p, *arg = NULL, *start;
++      char *errmess, *p, *arg, *start;
+       size_t len;
+ 
+       /* Memory allocation failure longjmps here if mem_recover == 1 */ 
+@@ -4100,6 +4100,7 @@ static void read_file(char *file, FILE *f, int hard_opt)
+ 	  mem_recover = 1;
+ 	}
+       
++      arg = NULL;
+       lineno++;
+       errmess = NULL;
+       
+-- 
+2.9.3
+

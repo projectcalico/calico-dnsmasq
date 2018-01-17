@@ -1,0 +1,36 @@
+From 6eaafb18e56928881bae371ba8bb05ee93f55d54 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20Men=C5=A1=C3=ADk?= <pemensik@redhat.com>
+Date: Tue, 14 Mar 2017 15:24:58 +0100
+Subject: [PATCH 2/2] Document real behaviour of labels with --interface
+
+---
+ man/dnsmasq.8 | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
+
+diff --git a/man/dnsmasq.8 b/man/dnsmasq.8
+index 523c823..6e93cf1 100644
+--- a/man/dnsmasq.8
++++ b/man/dnsmasq.8
+@@ -203,12 +203,14 @@ or
+ options are given dnsmasq listens on all available interfaces except any
+ given in
+ .B \--except-interface
+-options. IP alias interfaces (eg "eth1:0") cannot be used with
+-.B --interface
++options. IP alias interface names (eg "eth1:0") can be used only in
++.B \--bind-interfaces
+ or
+-.B --except-interface
+-options, use --listen-address instead. A simple wildcard, consisting
+-of a trailing '*', can be used in 
++.B \--bind-dynamic
++mode. Use
++.B \--listen-address
++in the default mode instead. A simple wildcard, consisting of a trailing '*',
++can be used in
+ .B \--interface 
+ and
+ .B \--except-interface
+-- 
+2.9.3
+

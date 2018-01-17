@@ -1,0 +1,29 @@
+From 16800ea072dd0cdf14d951c4bb8d2808b3dfe53d Mon Sep 17 00:00:00 2001
+From: Simon Kelley <simon@thekelleys.org.uk>
+Date: Tue, 30 Aug 2016 23:07:06 +0100
+Subject: [PATCH] Fix crash introduced in
+ 2675f2061525bc954be14988d64384b74aa7bf8b
+
+---
+ src/network.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/src/network.c b/src/network.c
+index ddf8d31..d87d08f 100644
+--- a/src/network.c
++++ b/src/network.c
+@@ -1516,8 +1516,9 @@ void check_servers(void)
+ 	      serv->flags |= SERV_MARK;
+ 	      continue;
+ 	    }
+-
+-	  serv->sfd->used = 1;
++	  
++	  if (serv->sfd)
++	    serv->sfd->used = 1;
+ 	}
+       
+       if (!(serv->flags & SERV_NO_REBIND) && !(serv->flags & SERV_LITERAL_ADDRESS))
+-- 
+2.9.3
+

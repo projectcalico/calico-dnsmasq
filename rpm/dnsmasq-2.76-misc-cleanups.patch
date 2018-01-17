@@ -1,0 +1,63 @@
+From 3947ab0069e443e72debe26379b8517fac8f6e41 Mon Sep 17 00:00:00 2001
+From: Simon Kelley <simon@thekelleys.org.uk>
+Date: Mon, 25 Sep 2017 20:19:55 +0100
+Subject: [PATCH 8/9]     Misc code cleanups arising from Google analysis.    
+ No security impleications or CVEs.
+
+---
+ src/edns0.c   | 2 +-
+ src/rfc1035.c | 4 +++-
+ src/rfc2131.c | 2 +-
+ 3 files changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/src/edns0.c b/src/edns0.c
+index a8d0167..0552d38 100644
+--- a/src/edns0.c
++++ b/src/edns0.c
+@@ -159,7 +159,7 @@ size_t add_pseudoheader(struct dns_header *header, size_t plen, unsigned char *l
+ 	      /* delete option if we're to replace it. */
+ 	      p -= 4;
+ 	      rdlen -= len + 4;
+-	      memcpy(p, p+len+4, rdlen - i);
++	      memmove(p, p+len+4, rdlen - i);
+ 	      PUTSHORT(rdlen, lenp);
+ 	      lenp -= 2;
+ 	    }
+diff --git a/src/rfc1035.c b/src/rfc1035.c
+index 78410d6..917bac2 100644
+--- a/src/rfc1035.c
++++ b/src/rfc1035.c
+@@ -37,7 +37,7 @@ int extract_name(struct dns_header *header, size_t plen, unsigned char **pp,
+ 	/* end marker */
+ 	{
+ 	  /* check that there are the correct no of bytes after the name */
+-	  if (!CHECK_LEN(header, p, plen, extrabytes))
++	  if (!CHECK_LEN(header, p1 ? p1 : p, plen, extrabytes))
+ 	    return 0;
+ 	  
+ 	  if (isExtract)
+@@ -485,6 +485,8 @@ static unsigned char *do_doctor(unsigned char *p, int count, struct dns_header *
+ 	    {
+ 	      unsigned int i, len = *p1;
+ 	      unsigned char *p2 = p1;
++	      if ((p1 + len - p) >= rdlen)
++	        return 0; /* bad packet */
+ 	      /* make counted string zero-term  and sanitise */
+ 	      for (i = 0; i < len; i++)
+ 		{
+diff --git a/src/rfc2131.c b/src/rfc2131.c
+index 75893a6..71d5846 100644
+--- a/src/rfc2131.c
++++ b/src/rfc2131.c
+@@ -155,7 +155,7 @@ size_t dhcp_reply(struct dhcp_context *context, char *iface_name, int int_index,
+ 	  for (offset = 0; offset < (len - 5); offset += elen + 5)
+ 	    {
+ 	      elen = option_uint(opt, offset + 4 , 1);
+-	      if (option_uint(opt, offset, 4) == BRDBAND_FORUM_IANA)
++	      if (option_uint(opt, offset, 4) == BRDBAND_FORUM_IANA && offset + elen + 5 <= len)
+ 		{
+ 		  unsigned char *x = option_ptr(opt, offset + 5);
+ 		  unsigned char *y = option_ptr(opt, offset + elen + 5);
+-- 
+2.9.5
+

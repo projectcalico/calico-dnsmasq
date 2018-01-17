@@ -1,0 +1,254 @@
+From 7ab5d6bd1f8b018c73341f50a395405dee6873d8 Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Wed, 15 Mar 2017 14:26:04 +0100
+Subject: [PATCH] Coverity fixes
+
+---
+ src/dbus.c        |  2 +-
+ src/dhcp-common.c |  2 +-
+ src/dhcp.c        |  4 ++--
+ src/dnsmasq.h     |  2 +-
+ src/edns0.c       |  2 ++
+ src/inotify.c     |  9 ++++++---
+ src/lease.c       |  4 ++--
+ src/network.c     |  8 ++++----
+ src/option.c      | 16 +++++++++++-----
+ src/tftp.c        |  2 +-
+ src/util.c        |  2 +-
+ 11 files changed, 32 insertions(+), 21 deletions(-)
+
+diff --git a/src/dbus.c b/src/dbus.c
+index 2e1a48e..f27ec3e 100644
+--- a/src/dbus.c
++++ b/src/dbus.c
+@@ -550,7 +550,7 @@ static DBusMessage *dbus_add_lease(DBusMessage* message)
+ 					 "Invalid IP address '%s'", ipaddr);
+    
+   hw_len = parse_hex((char*)hwaddr, dhcp_chaddr, DHCP_CHADDR_MAX, NULL, &hw_type);
+-  if (hw_type == 0 && hw_len != 0)
++  if (hw_type == 0 && hw_len > 0)
+     hw_type = ARPHRD_ETHER;
+   
+   lease_set_hwaddr(lease, dhcp_chaddr, clid, hw_len, hw_type,
+diff --git a/src/dhcp-common.c b/src/dhcp-common.c
+index 08528e8..ebf06b6 100644
+--- a/src/dhcp-common.c
++++ b/src/dhcp-common.c
+@@ -487,7 +487,7 @@ void  bindtodevice(char *device, int fd)
+ {
+   struct ifreq ifr;
+   
+-  strcpy(ifr.ifr_name, device);
++  strncpy(ifr.ifr_name, device, IF_NAMESIZE-1);
+   /* only allowed by root. */
+   if (setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE, (void *)&ifr, sizeof(ifr)) == -1 &&
+       errno != EPERM)
+diff --git a/src/dhcp.c b/src/dhcp.c
+index 10f1fb9..37bb71e 100644
+--- a/src/dhcp.c
++++ b/src/dhcp.c
+@@ -246,7 +246,7 @@ void dhcp_packet(time_t now, int pxe_fd)
+ 	      }
+ 	    else 
+ 	      {
+-		strncpy(ifr.ifr_name,  bridge->iface, IF_NAMESIZE);
++		strncpy(ifr.ifr_name,  bridge->iface, IF_NAMESIZE-1);
+ 		break;
+ 	      }
+ 	  }
+@@ -270,7 +270,7 @@ void dhcp_packet(time_t now, int pxe_fd)
+       is_relay_reply = 1; 
+       iov.iov_len = sz;
+ #ifdef HAVE_LINUX_NETWORK
+-      strncpy(arp_req.arp_dev, ifr.ifr_name, 16);
++      strncpy(arp_req.arp_dev, ifr.ifr_name, IF_NAMESIZE-1);
+ #endif 
+     }
+   else
+diff --git a/src/dnsmasq.h b/src/dnsmasq.h
+index dfd15aa..1179492 100644
+--- a/src/dnsmasq.h
++++ b/src/dnsmasq.h
+@@ -180,7 +180,7 @@ struct event_desc {
+ #define EC_INIT_OFFSET 10
+ 
+ /* Trust the compiler dead-code eliminator.... */
+-#define option_bool(x) (((x) < 32) ? daemon->options & (1u << (x)) : daemon->options2 & (1u << ((x) - 32)))
++#define option_bool(x) (((x) < 32) ? daemon->options & (1u << ((x)&0x1F)) : daemon->options2 & (1u << ((x) - 32)))
+ 
+ #define OPT_BOGUSPRIV      0
+ #define OPT_FILTER         1
+diff --git a/src/edns0.c b/src/edns0.c
+index c7a101e..d2b514b 100644
+--- a/src/edns0.c
++++ b/src/edns0.c
+@@ -263,6 +263,8 @@ static size_t add_dns_client(struct dns_header *header, size_t plen, unsigned ch
+ 	  encode[8] = 0;
+ 	}
+     }
++  else
++    encode[0] = '\0';
+ 
+   return add_pseudoheader(header, plen, limit, PACKETSZ, EDNS0_OPTION_NOMDEVICEID, (unsigned char *)encode, strlen(encode), 0, replace); 
+ }
+diff --git a/src/inotify.c b/src/inotify.c
+index 603ce9d..fcc0d97 100644
+--- a/src/inotify.c
++++ b/src/inotify.c
+@@ -224,17 +224,20 @@ int inotify_check(time_t now)
+       
+       if (rc <= 0)
+ 	break;
++      else
++        inotify_buffer[rc] = '\0';
+       
+       for (p = inotify_buffer; rc - (p - inotify_buffer) >= (int)sizeof(struct inotify_event); p += sizeof(struct inotify_event) + in->len) 
+ 	{
+ 	  in = (struct inotify_event*)p;
+-	  
++
+ 	  for (res = daemon->resolv_files; res; res = res->next)
+-	    if (res->wd == in->wd && in->len != 0 && strcmp(res->file, in->name) == 0)
++	    if (res->wd == in->wd && in->len != 0 && strncmp(res->file, in->name, NAME_MAX) == 0)
+ 	      hit = 1;
+ 
+ 	  /* ignore emacs backups and dotfiles */
+-	  if (in->len == 0 || 
++	  if (in->len == 0 ||
++	      in->len > NAME_MAX+1 ||
+ 	      in->name[in->len - 1] == '~' ||
+ 	      (in->name[0] == '#' && in->name[in->len - 1] == '#') ||
+ 	      in->name[0] == '.')
+diff --git a/src/lease.c b/src/lease.c
+index 20cac90..9ad106d 100644
+--- a/src/lease.c
++++ b/src/lease.c
+@@ -827,9 +827,9 @@ void lease_set_hwaddr(struct dhcp_lease *lease, const unsigned char *hwaddr,
+ 
+   if (hw_len != lease->hwaddr_len ||
+       hw_type != lease->hwaddr_type || 
+-      (hw_len != 0 && memcmp(lease->hwaddr, hwaddr, hw_len) != 0))
++      (hw_len > 0 && memcmp(lease->hwaddr, hwaddr, hw_len) != 0))
+     {
+-      if (hw_len != 0)
++      if (hw_len > 0)
+ 	memcpy(lease->hwaddr, hwaddr, hw_len);
+       lease->hwaddr_len = hw_len;
+       lease->hwaddr_type = hw_type;
+diff --git a/src/network.c b/src/network.c
+index 6119039..fcd9d8d 100644
+--- a/src/network.c
++++ b/src/network.c
+@@ -188,7 +188,7 @@ int loopback_exception(int fd, int family, struct all_addr *addr, char *name)
+   struct ifreq ifr;
+   struct irec *iface;
+ 
+-  strncpy(ifr.ifr_name, name, IF_NAMESIZE);
++  strncpy(ifr.ifr_name, name, IF_NAMESIZE-1);
+   if (ioctl(fd, SIOCGIFFLAGS, &ifr) != -1 &&
+       ifr.ifr_flags & IFF_LOOPBACK)
+     {
+@@ -1206,7 +1206,7 @@ int local_bind(int fd, union mysockaddr *addr, char *intname, int is_tcp)
+     return 0;
+     
+ #if defined(SO_BINDTODEVICE)
+-  if (intname[0] != 0 &&
++  if (intname && intname[0] != 0 &&
+       setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE, intname, IF_NAMESIZE) == -1)
+     return 0;
+ #endif
+@@ -1245,7 +1245,7 @@ static struct serverfd *allocate_sfd(union mysockaddr *addr, char *intname)
+   /* may have a suitable one already */
+   for (sfd = daemon->sfds; sfd; sfd = sfd->next )
+     if (sockaddr_isequal(&sfd->source_addr, addr) &&
+-	strcmp(intname, sfd->interface) == 0 &&
++	intname && strcmp(intname, sfd->interface) == 0 &&
+ 	ifindex == sfd->ifindex) 
+       return sfd;
+   
+@@ -1437,7 +1437,7 @@ void add_update_server(int flags,
+ 	serv->flags |= SERV_HAS_DOMAIN;
+       
+       if (interface)
+-	strcpy(serv->interface, interface);      
++	strncpy(serv->interface, interface, sizeof(serv->interface)-1);
+       if (addr)
+ 	serv->addr = *addr;
+       if (source_addr)
+diff --git a/src/option.c b/src/option.c
+index 5503b79..eb78b1a 100644
+--- a/src/option.c
++++ b/src/option.c
+@@ -3929,13 +3929,15 @@ static int one_opt(int option, char *arg, char *errstr, char *gen_err, int comma
+       
+     case LOPT_HOST_REC: /* --host-record */
+       {
+-	struct host_record *new = opt_malloc(sizeof(struct host_record));
+-	memset(new, 0, sizeof(struct host_record));
+-	new->ttl = -1;
++	struct host_record *new;
+ 
+ 	if (!arg || !(comma = split(arg)))
+ 	  ret_err(_("Bad host-record"));
+ 	
++	new = opt_malloc(sizeof(struct host_record));
++	memset(new, 0, sizeof(struct host_record));
++	new->ttl = -1;
++
+ 	while (arg)
+ 	  {
+ 	    struct all_addr addr;
+@@ -3956,10 +3958,11 @@ static int one_opt(int option, char *arg, char *errstr, char *gen_err, int comma
+ 	      {
+ 		int nomem;
+ 		char *canon = canonicalise(arg, &nomem);
+-		struct name_list *nl = opt_malloc(sizeof(struct name_list));
++		struct name_list *nl;
+ 		if (!canon)
+ 		  ret_err(_("Bad name in host-record"));
+ 
++		nl = opt_malloc(sizeof(struct name_list));
+ 		nl->name = canon;
+ 		/* keep order, so that PTR record goes to first name */
+ 		nl->next = NULL;
+@@ -4023,7 +4026,10 @@ static int one_opt(int option, char *arg, char *errstr, char *gen_err, int comma
+ 	    !atoi_check8(algo, &new->algo) ||
+ 	    !atoi_check8(digest, &new->digest_type) ||
+ 	    !(new->name = canonicalise_opt(arg)))
+-	  ret_err(_("bad trust anchor"));
++	  {
++	    free(new);
++	    ret_err(_("bad trust anchor"));
++	  }
+ 	    
+ 	/* Upper bound on length */
+ 	len = (2*strlen(keyhex))+1;
+diff --git a/src/tftp.c b/src/tftp.c
+index 5e4a32a..bd8c622 100644
+--- a/src/tftp.c
++++ b/src/tftp.c
+@@ -234,7 +234,7 @@ void tftp_request(struct listener *listen, time_t now)
+ #endif
+ 	}
+ 
+-      strncpy(ifr.ifr_name, name, IF_NAMESIZE);
++      strncpy(ifr.ifr_name, name, IF_NAMESIZE-1);
+       if (ioctl(listen->tftpfd, SIOCGIFMTU, &ifr) != -1)
+ 	{
+ 	  mtu = ifr.ifr_mtu;  
+diff --git a/src/util.c b/src/util.c
+index 93b24f5..1a9f228 100644
+--- a/src/util.c
++++ b/src/util.c
+@@ -491,7 +491,7 @@ int parse_hex(char *in, unsigned char *out, int maxlen,
+ 		  int j, bytes = (1 + (r - in))/2;
+ 		  for (j = 0; j < bytes; j++)
+ 		    { 
+-		      char sav = sav;
++		      char sav;
+ 		      if (j < bytes - 1)
+ 			{
+ 			  sav = in[(j+1)*2];
+-- 
+2.9.3
+
