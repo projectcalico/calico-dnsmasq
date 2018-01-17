@@ -23,14 +23,6 @@ Source0:        http://www.thekelleys.org.uk/dnsmasq/%{?extrapath}%{name}-%{vers
 Source1:        %{name}.service
 # upstream git: git://thekelleys.org.uk/dnsmasq.git
 
-Patch9:		dnsmasq-2.76-CVE-2017-14491.patch
-Patch10:	dnsmasq-2.76-CVE-2017-14492.patch
-Patch11:	dnsmasq-2.76-CVE-2017-14493.patch
-Patch12:	dnsmasq-2.76-CVE-2017-14494.patch
-Patch13:	dnsmasq-2.76-CVE-2017-14496.patch
-Patch14:	dnsmasq-2.76-CVE-2017-14495.patch
-# commit a3303e196e5d304ec955c4d63afb923ade66c6e8
-Patch15:	dnsmasq-2.76-gita3303e196.patch
 Patch16:	dnsmasq-2.76-underflow.patch
 Patch17:	dnsmasq-2.76-misc-cleanups.patch
 Patch18:	dnsmasq-2.76-CVE-2017-14491-2.patch
@@ -69,13 +61,6 @@ query/remove a DHCP server's leases.
 %prep
 %setup -q -n %{name}-%{version}%{?extraversion}
 
-%patch9 -p1 -b .CVE-2017-14491
-%patch10 -p1 -b .CVE-2017-14492
-%patch11 -p1 -b .CVE-2017-14493
-%patch12 -p1 -b .CVE-2017-14494
-%patch13 -p1 -b .CVE-2017-14496
-%patch14 -p1 -b .CVE-2017-14495
-%patch15 -p1 -b .gita3303e196
 %patch16 -p1 -b .underflow
 %patch17 -p1 -b .misc
 %patch18 -p1 -b .CVE-2017-14491-2
