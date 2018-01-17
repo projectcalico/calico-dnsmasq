@@ -23,32 +23,8 @@ Source0:        http://www.thekelleys.org.uk/dnsmasq/%{?extrapath}%{name}-%{vers
 Source1:        %{name}.service
 # upstream git: git://thekelleys.org.uk/dnsmasq.git
 
-# https://bugzilla.redhat.com/show_bug.cgi?id=1367772
-# commit 2675f2061525bc954be14988d64384b74aa7bf8b
-# after v2.76
-Patch1:         dnsmasq-2.76-dns-sleep-resume.patch
-# commit 591ed1e90503817938ccf5f127e677a8dd48b6d8
-Patch2:         dnsmasq-2.76-fix-dhcp-option-arrangements.patch
-# commit 396750cef533cf72c7e6a72e47a9c93e2e431cb7
-Patch3:         dnsmasq-2.76-pftables.patch
-# commit 16800ea072dd0cdf14d951c4bb8d2808b3dfe53d
-Patch4:         dnsmasq-2.76-fix-crash-dns-resume.patch
-# commit 13dee6f49e1d035b8069947be84ee8da2af0c420
-Patch5:		dnsmasq-2.76-warning-fixes.patch
-Patch6:		dnsmasq-2.76-label-warning.patch
-Patch7:		dnsmasq-2.76-label-man.patch
 Patch8:		dnsmasq-2.76-coverity.patch
-Patch9:		dnsmasq-2.76-CVE-2017-14491.patch
-Patch10:	dnsmasq-2.76-CVE-2017-14492.patch
-Patch11:	dnsmasq-2.76-CVE-2017-14493.patch
-Patch12:	dnsmasq-2.76-CVE-2017-14494.patch
-Patch13:	dnsmasq-2.76-CVE-2017-14496.patch
-Patch14:	dnsmasq-2.76-CVE-2017-14495.patch
-# commit a3303e196e5d304ec955c4d63afb923ade66c6e8
-Patch15:	dnsmasq-2.76-gita3303e196.patch
 Patch16:	dnsmasq-2.76-underflow.patch
-Patch17:	dnsmasq-2.76-misc-cleanups.patch
-Patch18:	dnsmasq-2.76-CVE-2017-14491-2.patch
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -84,24 +60,8 @@ query/remove a DHCP server's leases.
 %prep
 %setup -q -n %{name}-%{version}%{?extraversion}
 
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%patch6 -p1
-%patch7 -p1
 %patch8 -p1 -b .coverity
-%patch9 -p1 -b .CVE-2017-14491
-%patch10 -p1 -b .CVE-2017-14492
-%patch11 -p1 -b .CVE-2017-14493
-%patch12 -p1 -b .CVE-2017-14494
-%patch13 -p1 -b .CVE-2017-14496
-%patch14 -p1 -b .CVE-2017-14495
-%patch15 -p1 -b .gita3303e196
 %patch16 -p1 -b .underflow
-%patch17 -p1 -b .misc
-%patch18 -p1 -b .CVE-2017-14491-2
 
 # use /var/lib/dnsmasq instead of /var/lib/misc
 for file in dnsmasq.conf.example man/dnsmasq.8 man/es/dnsmasq.8 src/config.h; do
@@ -311,7 +271,7 @@ rm -rf $RPM_BUILD_ROOT
 - Handle locally-routed DNS Queries (#904940)
 
 * Thu Jan 24 2013 Tomas Hozza <thozza@redhat.com> - 2.65-3
-- build dnsmasq with $RPM_OPT_FLAGS, $RPM_LD_FLAGS explicitly (#903362) 
+- build dnsmasq with $RPM_OPT_FLAGS, $RPM_LD_FLAGS explicitly (#903362)
 
 * Tue Jan 22 2013 Tomas Hozza <thozza@redhat.com> - 2.65-2
 - Fix for CVE-2013-0198 (checking of TCP connection interfaces) (#901555)
