@@ -23,9 +23,6 @@ Source0:        http://www.thekelleys.org.uk/dnsmasq/%{?extrapath}%{name}-%{vers
 Source1:        %{name}.service
 # upstream git: git://thekelleys.org.uk/dnsmasq.git
 
-Patch17:	dnsmasq-2.76-misc-cleanups.patch
-Patch18:	dnsmasq-2.76-CVE-2017-14491-2.patch
-
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:  dbus-devel
@@ -59,9 +56,6 @@ query/remove a DHCP server's leases.
 
 %prep
 %setup -q -n %{name}-%{version}%{?extraversion}
-
-%patch17 -p1 -b .misc
-%patch18 -p1 -b .CVE-2017-14491-2
 
 # use /var/lib/dnsmasq instead of /var/lib/misc
 for file in dnsmasq.conf.example man/dnsmasq.8 man/es/dnsmasq.8 src/config.h; do
