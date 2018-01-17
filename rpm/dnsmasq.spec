@@ -12,7 +12,7 @@
 %define _hardened_build 1
 
 Name:           dnsmasq
-Version:        2.76
+Version:        2.79_test1_calico1
 Release:        2%{?extraversion}%{?dist}.2
 Summary:        A lightweight DHCP/caching DNS server
 
@@ -84,13 +84,6 @@ query/remove a DHCP server's leases.
 %prep
 %setup -q -n %{name}-%{version}%{?extraversion}
 
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%patch6 -p1
-%patch7 -p1
 %patch8 -p1 -b .coverity
 %patch9 -p1 -b .CVE-2017-14491
 %patch10 -p1 -b .CVE-2017-14492
@@ -188,6 +181,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/dhcp_*
 
 %changelog
+* Wed Jan 17 2018 Neil Jerram <neil@tigera.io> - 2.79_test1_calico1-2.2
+- Test package for arbitrarily long options
+
 * Wed Sep 27 2017 Petr Menšík <pemensik@redhat.com> - 2.76-2.2
 - Small correction of CVE-2017-14491
 
@@ -311,7 +307,7 @@ rm -rf $RPM_BUILD_ROOT
 - Handle locally-routed DNS Queries (#904940)
 
 * Thu Jan 24 2013 Tomas Hozza <thozza@redhat.com> - 2.65-3
-- build dnsmasq with $RPM_OPT_FLAGS, $RPM_LD_FLAGS explicitly (#903362) 
+- build dnsmasq with $RPM_OPT_FLAGS, $RPM_LD_FLAGS explicitly (#903362)
 
 * Tue Jan 22 2013 Tomas Hozza <thozza@redhat.com> - 2.65-2
 - Fix for CVE-2013-0198 (checking of TCP connection interfaces) (#901555)
