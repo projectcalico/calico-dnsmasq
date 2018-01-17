@@ -550,7 +550,7 @@ static DBusMessage *dbus_add_lease(DBusMessage* message)
 					 "Invalid IP address '%s'", ipaddr);
    
   hw_len = parse_hex((char*)hwaddr, dhcp_chaddr, DHCP_CHADDR_MAX, NULL, &hw_type);
-  if (hw_type == 0 && hw_len != 0)
+  if (hw_type == 0 && hw_len > 0)
     hw_type = ARPHRD_ETHER;
   
   lease_set_hwaddr(lease, dhcp_chaddr, clid, hw_len, hw_type,

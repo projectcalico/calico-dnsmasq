@@ -23,7 +23,6 @@ Source0:        http://www.thekelleys.org.uk/dnsmasq/%{?extrapath}%{name}-%{vers
 Source1:        %{name}.service
 # upstream git: git://thekelleys.org.uk/dnsmasq.git
 
-Patch8:		dnsmasq-2.76-coverity.patch
 Patch16:	dnsmasq-2.76-underflow.patch
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -60,7 +59,6 @@ query/remove a DHCP server's leases.
 %prep
 %setup -q -n %{name}-%{version}%{?extraversion}
 
-%patch8 -p1 -b .coverity
 %patch16 -p1 -b .underflow
 
 # use /var/lib/dnsmasq instead of /var/lib/misc

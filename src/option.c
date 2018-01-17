@@ -4073,13 +4073,15 @@ err:
       
     case LOPT_HOST_REC: /* --host-record */
       {
-	struct host_record *new = opt_malloc(sizeof(struct host_record));
-	memset(new, 0, sizeof(struct host_record));
-	new->ttl = -1;
+	struct host_record *new;
 
 	if (!arg || !(comma = split(arg)))
 	  ret_err(_("Bad host-record"));
 	
+	new = opt_malloc(sizeof(struct host_record));
+	memset(new, 0, sizeof(struct host_record));
+	new->ttl = -1;
+
 	while (arg)
 	  {
 	    struct all_addr addr;
@@ -4100,10 +4102,11 @@ err:
 	      {
 		int nomem;
 		char *canon = canonicalise(arg, &nomem);
-		struct name_list *nl = opt_malloc(sizeof(struct name_list));
+		struct name_list *nl;
 		if (!canon)
 		  ret_err(_("Bad name in host-record"));
 
+		nl = opt_malloc(sizeof(struct name_list));
 		nl->name = canon;
 		/* keep order, so that PTR record goes to first name */
 		nl->next = NULL;
@@ -4167,7 +4170,10 @@ err:
 	    !atoi_check8(algo, &new->algo) ||
 	    !atoi_check8(digest, &new->digest_type) ||
 	    !(new->name = canonicalise_opt(arg)))
-	  ret_err(_("bad trust anchor"));
+	  {
+	    free(new);
+	    ret_err(_("bad trust anchor"));
+	  }
 	    
 	/* Upper bound on length */
 	len = (2*strlen(keyhex))+1;

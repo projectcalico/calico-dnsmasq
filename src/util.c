@@ -522,7 +522,7 @@ int parse_hex(char *in, unsigned char *out, int maxlen,
 		  int j, bytes = (1 + (r - in))/2;
 		  for (j = 0; j < bytes; j++)
 		    { 
-		      char sav = sav;
+		      char sav;
 		      if (j < bytes - 1)
 			{
 			  sav = in[(j+1)*2];

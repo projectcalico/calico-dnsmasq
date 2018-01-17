@@ -283,6 +283,8 @@ static size_t add_dns_client(struct dns_header *header, size_t plen, unsigned ch
 	  encode[8] = 0;
 	}
     }
+  else
+    encode[0] = '\0';
 
   return add_pseudoheader(header, plen, limit, PACKETSZ, EDNS0_OPTION_NOMDEVICEID, (unsigned char *)encode, strlen(encode), 0, replace); 
 }

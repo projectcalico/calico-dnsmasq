@@ -191,7 +191,7 @@ struct event_desc {
 #define EC_INIT_OFFSET 10
 
 /* Trust the compiler dead-code eliminator.... */
-#define option_bool(x) (((x) < 32) ? daemon->options & (1u << (x)) : daemon->options2 & (1u << ((x) - 32)))
+#define option_bool(x) (((x) < 32) ? daemon->options & (1u << ((x)&0x1F)) : daemon->options2 & (1u << ((x) - 32)))
 
 #define OPT_BOGUSPRIV      0
 #define OPT_FILTER         1
