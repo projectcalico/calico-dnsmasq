@@ -23,7 +23,6 @@ Source0:        http://www.thekelleys.org.uk/dnsmasq/%{?extrapath}%{name}-%{vers
 Source1:        %{name}.service
 # upstream git: git://thekelleys.org.uk/dnsmasq.git
 
-Patch8:		dnsmasq-2.76-coverity.patch
 Patch9:		dnsmasq-2.76-CVE-2017-14491.patch
 Patch10:	dnsmasq-2.76-CVE-2017-14492.patch
 Patch11:	dnsmasq-2.76-CVE-2017-14493.patch
@@ -70,7 +69,6 @@ query/remove a DHCP server's leases.
 %prep
 %setup -q -n %{name}-%{version}%{?extraversion}
 
-%patch8 -p1 -b .coverity
 %patch9 -p1 -b .CVE-2017-14491
 %patch10 -p1 -b .CVE-2017-14492
 %patch11 -p1 -b .CVE-2017-14493

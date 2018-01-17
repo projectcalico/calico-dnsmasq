@@ -858,9 +858,9 @@ void lease_set_hwaddr(struct dhcp_lease *lease, const unsigned char *hwaddr,
 
   if (hw_len != lease->hwaddr_len ||
       hw_type != lease->hwaddr_type || 
-      (hw_len != 0 && memcmp(lease->hwaddr, hwaddr, hw_len) != 0))
+      (hw_len > 0 && memcmp(lease->hwaddr, hwaddr, hw_len) != 0))
     {
-      if (hw_len != 0)
+      if (hw_len > 0)
 	memcpy(lease->hwaddr, hwaddr, hw_len);
       lease->hwaddr_len = hw_len;
       lease->hwaddr_type = hw_type;

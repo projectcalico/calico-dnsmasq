@@ -224,17 +224,20 @@ int inotify_check(time_t now)
       
       if (rc <= 0)
 	break;
+      else
+        inotify_buffer[rc] = '\0';
       
       for (p = inotify_buffer; rc - (p - inotify_buffer) >= (int)sizeof(struct inotify_event); p += sizeof(struct inotify_event) + in->len) 
 	{
 	  in = (struct inotify_event*)p;
-	  
+
 	  for (res = daemon->resolv_files; res; res = res->next)
-	    if (res->wd == in->wd && in->len != 0 && strcmp(res->file, in->name) == 0)
+	    if (res->wd == in->wd && in->len != 0 && strncmp(res->file, in->name, NAME_MAX) == 0)
 	      hit = 1;
 
 	  /* ignore emacs backups and dotfiles */
-	  if (in->len == 0 || 
+	  if (in->len == 0 ||
+	      in->len > NAME_MAX+1 ||
 	      in->name[in->len - 1] == '~' ||
 	      (in->name[0] == '#' && in->name[in->len - 1] == '#') ||
 	      in->name[0] == '.')

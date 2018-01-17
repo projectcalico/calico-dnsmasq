@@ -188,7 +188,7 @@ int loopback_exception(int fd, int family, struct all_addr *addr, char *name)
   struct ifreq ifr;
   struct irec *iface;
 
-  strncpy(ifr.ifr_name, name, IF_NAMESIZE);
+  strncpy(ifr.ifr_name, name, IF_NAMESIZE-1);
   if (ioctl(fd, SIOCGIFFLAGS, &ifr) != -1 &&
       ifr.ifr_flags & IFF_LOOPBACK)
     {
@@ -1224,7 +1224,7 @@ int local_bind(int fd, union mysockaddr *addr, char *intname, unsigned int ifind
     }
 
 #if defined(SO_BINDTODEVICE)
-  if (intname[0] != 0 &&
+  if (intname && intname[0] != 0 &&
       setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE, intname, IF_NAMESIZE) == -1)
     return 0;
 #endif
@@ -1263,7 +1263,7 @@ static struct serverfd *allocate_sfd(union mysockaddr *addr, char *intname)
   /* may have a suitable one already */
   for (sfd = daemon->sfds; sfd; sfd = sfd->next )
     if (sockaddr_isequal(&sfd->source_addr, addr) &&
-	strcmp(intname, sfd->interface) == 0 &&
+	intname && strcmp(intname, sfd->interface) == 0 &&
 	ifindex == sfd->ifindex) 
       return sfd;
   
@@ -1455,7 +1455,7 @@ void add_update_server(int flags,
 	serv->flags |= SERV_HAS_DOMAIN;
       
       if (interface)
-	strcpy(serv->interface, interface);      
+	strncpy(serv->interface, interface, sizeof(serv->interface)-1);
       if (addr)
 	serv->addr = *addr;
       if (source_addr)

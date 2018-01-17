@@ -487,7 +487,7 @@ void  bindtodevice(char *device, int fd)
 {
   struct ifreq ifr;
   
-  strcpy(ifr.ifr_name, device);
+  strncpy(ifr.ifr_name, device, IF_NAMESIZE-1);
   /* only allowed by root. */
   if (setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE, (void *)&ifr, sizeof(ifr)) == -1 &&
       errno != EPERM)
