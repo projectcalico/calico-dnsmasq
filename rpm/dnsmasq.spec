@@ -23,20 +23,6 @@ Source0:        http://www.thekelleys.org.uk/dnsmasq/%{?extrapath}%{name}-%{vers
 Source1:        %{name}.service
 # upstream git: git://thekelleys.org.uk/dnsmasq.git
 
-# https://bugzilla.redhat.com/show_bug.cgi?id=1367772
-# commit 2675f2061525bc954be14988d64384b74aa7bf8b
-# after v2.76
-Patch1:         dnsmasq-2.76-dns-sleep-resume.patch
-# commit 591ed1e90503817938ccf5f127e677a8dd48b6d8
-Patch2:         dnsmasq-2.76-fix-dhcp-option-arrangements.patch
-# commit 396750cef533cf72c7e6a72e47a9c93e2e431cb7
-Patch3:         dnsmasq-2.76-pftables.patch
-# commit 16800ea072dd0cdf14d951c4bb8d2808b3dfe53d
-Patch4:         dnsmasq-2.76-fix-crash-dns-resume.patch
-# commit 13dee6f49e1d035b8069947be84ee8da2af0c420
-Patch5:		dnsmasq-2.76-warning-fixes.patch
-Patch6:		dnsmasq-2.76-label-warning.patch
-Patch7:		dnsmasq-2.76-label-man.patch
 Patch8:		dnsmasq-2.76-coverity.patch
 Patch9:		dnsmasq-2.76-CVE-2017-14491.patch
 Patch10:	dnsmasq-2.76-CVE-2017-14492.patch
