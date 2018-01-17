@@ -212,11 +212,11 @@ size_t add_pseudoheader(struct dns_header *header, size_t plen, unsigned char *l
       /* Copy back any options */
       if (buff)
 	{
-          if (p + rdlen > limit)
-          {
-            free(buff);
-            return plen; /* Too big */
-          }
+	  if (p + rdlen > limit)
+	  {
+	    free(buff);
+	    return plen; /* Too big */
+	  }
 	  memcpy(p, buff, rdlen);
 	  free(buff);
 	  p += rdlen;

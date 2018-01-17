@@ -23,7 +23,6 @@ Source0:        http://www.thekelleys.org.uk/dnsmasq/%{?extrapath}%{name}-%{vers
 Source1:        %{name}.service
 # upstream git: git://thekelleys.org.uk/dnsmasq.git
 
-Patch16:	dnsmasq-2.76-underflow.patch
 Patch17:	dnsmasq-2.76-misc-cleanups.patch
 Patch18:	dnsmasq-2.76-CVE-2017-14491-2.patch
 
@@ -61,7 +60,6 @@ query/remove a DHCP server's leases.
 %prep
 %setup -q -n %{name}-%{version}%{?extraversion}
 
-%patch16 -p1 -b .underflow
 %patch17 -p1 -b .misc
 %patch18 -p1 -b .CVE-2017-14491-2
 

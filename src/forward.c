@@ -1428,6 +1428,10 @@ void receive_query(struct listener *listen, time_t now)
 	udp_size = PACKETSZ; /* Sanity check - can't reduce below default. RFC 6891 6.2.3 */
     }
 
+  // Make sure the udp size is not smaller than the incoming message so that we
+  // do not underflow
+  if (udp_size < n) udp_size = n;
+
 #ifdef HAVE_AUTH
   if (auth_dns)
     {
