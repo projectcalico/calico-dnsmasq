@@ -1,4 +1,4 @@
-dnsmasq (2.79test1calico1-1) trusty; urgency=medium
+dnsmasq (2.79test1calico1-2~trusty) trusty; urgency=medium
 
   * Test package for arbitrarily long options
 
