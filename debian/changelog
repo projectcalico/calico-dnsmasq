@@ -1,3 +1,10 @@
+dnsmasq (2.79test1calico1-3~trusty) trusty; urgency=medium
+
+  * Define NO_NETTLE_ECC, as Trusty's nettle-dev is too old to support
+    that.
+
+ -- Neil Jerram <neil@tigera.io>  Sat, 27 Jan 2018 14:02:17 +0000
+
 dnsmasq (2.79test1calico1-2~trusty) trusty; urgency=medium
 
   * Test package for arbitrarily long options
