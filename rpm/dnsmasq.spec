@@ -12,7 +12,7 @@
 %define _hardened_build 1
 
 Name:           dnsmasq
-Version:        2.76
+Version:        2.79_calico1
 Release:        2%{?extraversion}%{?dist}.2
 Summary:        A lightweight DHCP/caching DNS server
 
@@ -142,6 +142,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/dhcp_*
 
 %changelog
+* Mon Apr 09 2018 Neil Jerram <neil@tigera.io> - 2.79_calico1-2.2
+- Test package for dnsmasq v2.79
+
 * Wed Sep 27 2017 Petr Menšík <pemensik@redhat.com> - 2.76-2.2
 - Small correction of CVE-2017-14491
 
